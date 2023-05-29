@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public enum ETileState
 {
@@ -24,19 +27,51 @@ public enum ETileDecoration
     TopRightSeparator
 }
 
+[RequireComponent(typeof(ExpandedButton))]
 public class GridTile : MonoBehaviour
 {
-    Color m_RequiredColor = Color.white;
+    [SerializeField] Image m_BackgroundImageComponent = null;
+    [SerializeField] Image m_ForegroundImageComponent = null;
+
+    [SerializeField] Color m_RequiredColor = Color.white;
     ETileState m_TileState = ETileState.Empty;
     bool m_IsColored = false;
     ETileColor m_TileBackgroundColor = ETileColor.White;
+    int m_WidthIndex = 0;
+    int m_HeightIndex = 0;
 
+    public void OnCursorEnter()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            GameManager.Get().GetGlobalEvents().OnTileClicked(this);
+        }
+    }
+
+    // Getters and Setters
     public Color GetRequiredColor() { return m_RequiredColor; }
-    public void SetRequiredColor(Color color) { m_RequiredColor = color; }
+    public void SetRequiredColor(Color color) 
+    {
+        m_RequiredColor = color;
+        
+    }
+
+    public void Paint(Color color)
+    {
+        m_ForegroundImageComponent.color = color;
+        m_ForegroundImageComponent.enabled = true;
+    }
+
     public ETileState GetTileState() { return m_TileState; }
     public void SetTileState(ETileState state) { m_TileState = state; }
     public bool GetIsColored() { return m_IsColored; }
     public void SetIsColored(bool isColored) { m_IsColored = isColored; }
     public ETileColor GetTileBackgroundColor() { return m_TileBackgroundColor; }
     public void SetTileBackgroundColor(ETileColor color) { m_TileBackgroundColor = color; }
+    public int GetWidthIndex() { return m_WidthIndex; }
+    public void SetWidthIndex(int index) { m_WidthIndex = index; }
+    public int GetHeightIndex() { return m_HeightIndex; }
+    public void SetHeightIndex(int index) { m_HeightIndex = index;}
+    public Image GetBackgroundImageComponent() { return m_BackgroundImageComponent; }
+    public Image GetForegroundImageComponent() { return m_ForegroundImageComponent; }
 }

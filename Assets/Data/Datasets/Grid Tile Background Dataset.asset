@@ -12,3 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dddbc97f1cf23ed4987e9707c7bbc887, type: 3}
   m_Name: Grid Tile Background Dataset
   m_EditorClassIdentifier: 
+  m_GridTileBackgroundPairs:
+  - color: 0
+    tileDecoration: 0
+    tileSprite: {fileID: 21300000, guid: 4baccc7cf9728434f870fb03d5293334, type: 3}
+  - color: 0
+    tileDecoration: 1
+    tileSprite: {fileID: 21300000, guid: 053d45d6a5af6a64c876683574bab757, type: 3}
+  - color: 0
+    tileDecoration: 2
+    tileSprite: {fileID: 21300000, guid: ca485f1e6b5d9464080ce90ec8d241d8, type: 3}
+  - color: 0
+    tileDecoration: 3
+    tileSprite: {fileID: 21300000, guid: 6e305eb2893a20646b29f6bd00c44ff6, type: 3}
+  - color: 1
+    tileDecoration: 0
+    tileSprite: {fileID: 21300000, guid: f321cd950e458244ba2eeaac0b6a0f1a, type: 3}
+  - color: 1
+    tileDecoration: 1
+    tileSprite: {fileID: 21300000, guid: 5d7c67f3a165b2a408f2fde0e2ae459c, type: 3}
+  - color: 1
+    tileDecoration: 2
+    tileSprite: {fileID: 21300000, guid: 7da1633b884596d44b02b2b740f14e95, type: 3}
+  - color: 1
+    tileDecoration: 3
+    tileSprite: {fileID: 21300000, guid: f46acede02492664eaf8edac8004c28a, type: 3}

@@ -1,14 +1,17 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UIViewModel;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class GridSpawner : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] RectTransform m_GridHolder = null;
+    [SerializeField] GridViewModel m_GridViewModelRef = null;
     [SerializeField] GridTilesBackgroundDataset m_GridTilesBackgroundDataset = null;
+
+    GridViewModel m_GridViewModel = null;
 
     [Header("Finetuning")]
     [SerializeField] float m_TileSpawnCooldown = 0.1f;
@@ -20,10 +23,24 @@ public class GridSpawner : MonoBehaviour
 
     ETileColor m_CurrentTileColor = ETileColor.White;
 
+    int m_GridWidth = 0;
+    int m_GridHeight = 0;
+
     public static event EventHandler OnGridSpawnedEvent;
+    public static event EventHandler OnTileSpawnedEvent;
+
+    public void Init()
+    {
+        m_GridViewModel = ViewModelHelper.SpawnAndInitialize(m_GridViewModelRef) as GridViewModel;
+    }
 
     public IEnumerator SpawnGrid(int gridWidth, int gridHeight)
     {
+        m_GridWidth = gridWidth;
+        m_GridHeight = gridHeight;
+
+        RectTransform gridHolder = m_GridViewModel.GetGridHolder();
+
         RectTransform rectTransform = m_TilePrefab.GetComponent<RectTransform>();
 
         Vector2 spawnPos = Vector2.zero;
@@ -35,8 +52,8 @@ public class GridSpawner : MonoBehaviour
             m_GridTiles.Add(new List<GridTile>());
 
             spawnPos.y += rectTransform.sizeDelta.y;
-            spawnPos.x = - ((rectTransform.sizeDelta.x * gridWidth) / 2 - rectTransform.sizeDelta.x / 2);
-            if  (i > 1)
+            spawnPos.x = -((rectTransform.sizeDelta.x * gridWidth) / 2 - rectTransform.sizeDelta.x / 2);
+            if (i > 1)
             {
                 int columnToCheck = i - 2;
                 int rowToCheck = 0;
@@ -50,9 +67,11 @@ public class GridSpawner : MonoBehaviour
             for (int j = 1; j <= gridWidth; ++j)
             {
                 GridTile newTile = Instantiate(m_TilePrefab, Vector3.zero, Quaternion.identity);
-                newTile.transform.SetParent(m_GridHolder);
+                newTile.transform.SetParent(gridHolder);
                 newTile.transform.localScale = Vector3.one;
                 newTile.GetComponent<RectTransform>().anchoredPosition = spawnPos;
+                newTile.SetWidthIndex(j);
+                newTile.SetHeightIndex(i);
 
                 ETileDecoration decoration = ETileDecoration.None;
                 if (i % 5 == 0 && j % 5 == 0)
@@ -67,8 +86,8 @@ public class GridSpawner : MonoBehaviour
                 {
                     decoration = ETileDecoration.TopSeparator;
                 }
-                
-                SetTileImage(newTile.gameObject, m_CurrentTileColor, decoration);
+
+                SetTileImage(newTile, m_CurrentTileColor, decoration);
                 newTile.SetTileBackgroundColor(m_CurrentTileColor);
 
                 ChangeNextTileColor();
@@ -91,10 +110,11 @@ public class GridSpawner : MonoBehaviour
             m_CurrentTileColor = ETileColor.White;
     }
 
-    private void SetTileImage(GameObject m_FieldPrefab, ETileColor tileColor, ETileDecoration tileDecoration)
+    private void SetTileImage(GridTile m_FieldPrefab, ETileColor tileColor, ETileDecoration tileDecoration)
     {
         Sprite spriteToSet = GetAssociatedTileBackground(tileColor, tileDecoration);
-        m_FieldPrefab.GetComponent<Image>().GetComponent<Image>().sprite = spriteToSet;
+        m_FieldPrefab.GetBackgroundImageComponent().sprite = spriteToSet;
+        m_FieldPrefab.GetForegroundImageComponent().enabled = false;
     }
 
     private Sprite GetAssociatedTileBackground(ETileColor tileColor, ETileDecoration tileDecoration)
@@ -104,13 +124,20 @@ public class GridSpawner : MonoBehaviour
 
     void TriggerOnGridSpawnedEvent(EventArgs args = null)
     {
-        if (OnGridSpawnedEvent != null)
-        {
-            OnGridSpawnedEvent(this, args);
-        }
-        else
-        {
-            Debug.LogError("OnGridSpawnedEvent is null. Cannot invoke");
-        }
+        OnGridSpawnedEvent?.Invoke(this, args);
+    }
+
+    public RectTransform GetGridHolder()
+    {
+        return m_GridViewModel.GetGridHolder();
+    }
+
+    public Nonogram CreateNonogram()
+    {
+        Nonogram newNonogram = new Nonogram();
+        newNonogram.CreateNonogram(m_GridTiles);
+        newNonogram.SetWidth(m_GridWidth);
+        newNonogram.SetHeight(m_GridHeight);
+        return newNonogram;
     }
 }

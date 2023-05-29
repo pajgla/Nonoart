@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
-public class ValueSelector : MonoBehaviour
+public class UIValueSelector : MonoBehaviour
 {
     [Header("References")]
     [SerializeField]

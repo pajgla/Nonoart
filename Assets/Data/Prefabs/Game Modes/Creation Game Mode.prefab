@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2068210937408498930
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2434898001407306687}
+  - component: {fileID: 5524337109058764133}
+  m_Layer: 0
+  m_Name: Creation Game Mode
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2434898001407306687
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068210937408498930}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 597.89185, y: 364.2471, z: -7.648677}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5524337109058764133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068210937408498930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dcf1ffc5a84bab4db53235ec711f6b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_GameModeType: 0
+  m_GridSpawnerRef: {fileID: 3136697373508339568, guid: 67d4a68c5e04d03469a5c71d2ecb38dd, type: 3}
+  m_GridMovementControllerRef: {fileID: 4107576596352379229, guid: 3f463aac9dda0884795117684c8bc06a, type: 3}
+  m_ColorPickerViewModelRef: {fileID: 6934744986928190336, guid: d2b7a8fba16c2c24d89171ce037f1710, type: 3}
+  m_ConfigurationViewModelRef: {fileID: 5086022923512234724, guid: ab03c91eea86464408da2a382119cf08, type: 3}
+  m_ControlBarViewModelRef: {fileID: 7247293075849220797, guid: 70375e76c2d72eb4982b803226ead062, type: 3}
+  m_LineDrawing: 0

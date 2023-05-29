@@ -12,9 +12,14 @@ public class GridMovementController : MonoBehaviour
 
     Vector3 m_LastMousePosition = Vector3.zero;
 
-    private void Start()
+    public void Init(RectTransform gridRect)
     {
-        GridSpawner.OnGridSpawnedEvent += OnGridSpawnedEventCallback;
+        m_GridRectTransform = gridRect;
+    }
+
+    public void SetCanDrag(bool canDrag)
+    {
+        m_CanDrag = canDrag;
     }
 
     private void Update()
@@ -35,10 +40,5 @@ public class GridMovementController : MonoBehaviour
             m_GridRectTransform.Translate(delta *  m_MovementSensitivity * Time.deltaTime);
             m_LastMousePosition = Input.mousePosition;
         }
-    }
-
-    private void OnGridSpawnedEventCallback(object caller, EventArgs args)
-    {
-        m_CanDrag = true;
     }
 }
