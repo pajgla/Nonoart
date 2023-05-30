@@ -67,4 +67,5 @@ public class GameManager : BaseSingleton<GameManager>
 
     //Getters
     public GlobalEvents GetGlobalEvents() { return m_GlobalEventsRef; }
+    public List<NonogramSet> GetNonogramSets() { return m_NonogramSets; }
 }

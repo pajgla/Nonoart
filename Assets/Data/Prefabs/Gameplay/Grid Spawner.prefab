@@ -46,5 +46,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GridViewModelRef: {fileID: 7605837204048042791, guid: 01ed99d2d5fe02e4795aef91d54d637f, type: 3}
   m_GridTilesBackgroundDataset: {fileID: 11400000, guid: 5caff50c4fe781d46a4a6bbb05db07d7, type: 2}
+  m_PixelCountWidget: {fileID: 7378902318912186151, guid: 9ef6bf06657631841b986d62a8ac62c7, type: 3}
   m_TileSpawnCooldown: 0.01
   m_TilePrefab: {fileID: 6951291442424618029, guid: 4345f32a885b74443a80ef17daed29d2, type: 3}

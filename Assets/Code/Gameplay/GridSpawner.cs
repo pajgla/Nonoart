@@ -10,6 +10,7 @@ public class GridSpawner : MonoBehaviour
     [Header("References")]
     [SerializeField] GridViewModel m_GridViewModelRef = null;
     [SerializeField] GridTilesBackgroundDataset m_GridTilesBackgroundDataset = null;
+    [SerializeField] PixelCountWidget m_PixelCountWidget = null;
 
     GridViewModel m_GridViewModel = null;
 
@@ -99,7 +100,80 @@ public class GridSpawner : MonoBehaviour
             }
         }
 
+        SpawnPixelCountWidgets();
         TriggerOnGridSpawnedEvent();
+    }
+
+    private void SpawnPixelCountWidgets()
+    {
+        for (int height = 0; height < m_GridHeight; height++)
+        {
+            PixelCountWidget pixelCountWidget = Instantiate(m_PixelCountWidget);
+            GridTile tile = m_GridTiles[height][0];
+            pixelCountWidget.AdjustPositionRelativeTo(tile.GetComponent<RectTransform>());
+
+            //Count pixels
+            int counter = 0;
+            bool isCounting = false;
+            for (int i = 0; i < m_GridWidth; i++)
+            {
+                GridTile currTile = m_GridTiles[height][i];
+                if (!currTile.GetIsEmpty())
+                {
+                    if (isCounting)
+                        counter++;
+                    else
+                    {
+                        isCounting = true;
+                        counter++;
+                    }
+                }
+                else
+                {
+                    if (isCounting)
+                    {
+                        isCounting = false;
+                        pixelCountWidget.AddPixelCount(counter);
+                        counter = 0;
+                    }
+                }
+            }
+        }
+
+        for (int width = 0; width < m_GridHeight; width++)
+        {
+            PixelCountWidget pixelCountWidget = Instantiate(m_PixelCountWidget);
+            pixelCountWidget.SetIsVertical(true);
+            GridTile tile = m_GridTiles[m_GridHeight - 1][width];
+            pixelCountWidget.AdjustPositionRelativeTo(tile.GetComponent<RectTransform>());
+
+            //Count pixels
+            int counter = 0;
+            bool isCounting = false;
+            for (int i = 0; i < m_GridWidth; i++)
+            {
+                GridTile currTile = m_GridTiles[m_GridHeight - 1][i];
+                if (!currTile.GetIsEmpty())
+                {
+                    if (isCounting)
+                        counter++;
+                    else
+                    {
+                        isCounting = true;
+                        counter++;
+                    }
+                }
+                else
+                {
+                    if (isCounting)
+                    {
+                        isCounting = false;
+                        pixelCountWidget.AddPixelCount(counter);
+                        counter = 0;
+                    }
+                }
+            }
+        }
     }
 
     private void ChangeNextTileColor()

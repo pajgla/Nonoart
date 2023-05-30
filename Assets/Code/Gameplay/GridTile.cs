@@ -27,6 +27,13 @@ public enum ETileDecoration
     TopRightSeparator
 }
 
+public struct ComplitedTileData
+{
+    public Color m_Color;
+    public int m_WidthIndex;
+    public int m_HeightIndex;
+}
+
 [RequireComponent(typeof(ExpandedButton))]
 public class GridTile : MonoBehaviour
 {
@@ -39,6 +46,7 @@ public class GridTile : MonoBehaviour
     ETileColor m_TileBackgroundColor = ETileColor.White;
     int m_WidthIndex = 0;
     int m_HeightIndex = 0;
+    bool m_IsEmpty = false;
 
     public void OnCursorEnter()
     {
@@ -46,6 +54,13 @@ public class GridTile : MonoBehaviour
         {
             GameManager.Get().GetGlobalEvents().OnTileClicked(this);
         }
+    }
+
+    public void Init(ComplitedTileData data)
+    {
+        SetRequiredColor(data.m_Color);
+        m_WidthIndex = data.m_WidthIndex;
+        m_HeightIndex = data.m_HeightIndex;
     }
 
     // Getters and Setters
@@ -74,4 +89,6 @@ public class GridTile : MonoBehaviour
     public void SetHeightIndex(int index) { m_HeightIndex = index;}
     public Image GetBackgroundImageComponent() { return m_BackgroundImageComponent; }
     public Image GetForegroundImageComponent() { return m_ForegroundImageComponent; }
+    public bool GetIsEmpty() { return m_IsEmpty; }
+    public void SetIsEmpty(bool isEmpty) {  m_IsEmpty = isEmpty; }
 }

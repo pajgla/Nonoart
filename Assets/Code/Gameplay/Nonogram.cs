@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -9,6 +10,7 @@ public class Nonogram
     private string m_NonogramName = "New Nonogram";
 
     List<List<GridTile>> m_GridTiles = new List<List<GridTile>>();
+    List<List<ComplitedTileData>> m_ComplitionTiles = new List<List<ComplitedTileData>>();
     int m_Width = 0;
     int m_Height = 0;
 
@@ -32,6 +34,11 @@ public class Nonogram
         m_GridTiles = new List<List<GridTile>>(gridTiles);
     }
 
+    public void AddRequiredColors(List<List<ComplitedTileData>> data)
+    {
+        m_ComplitionTiles = new List<List<ComplitedTileData>>(data);
+    }
+
     public void SetNonogramName(string name)
     {
         m_NonogramName = name;
@@ -45,6 +52,24 @@ public class Nonogram
     public List<List<GridTile>> GetTiles()
     {
         return m_GridTiles;
+    }
+
+    public Texture2D ConvertToTexture()
+    {
+        Texture2D newTexture = new Texture2D(m_Width, m_Height, TextureFormat.ARGB32, false);
+
+        newTexture.filterMode = FilterMode.Point;
+        for (int height = 0; height < m_Height; ++height)
+        {
+            for (int width = 0; width < m_Width; ++width)
+            {
+                newTexture.SetPixel(width, height, m_ComplitionTiles[height][width].m_Color);
+            }
+        }
+
+        newTexture.Apply();
+        File.WriteAllBytes(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Texture.jpg", newTexture.EncodeToJPG(1));
+        return newTexture;
     }
 
     public int GetWidth() { return m_Width; }
@@ -124,28 +149,29 @@ public class NonogramSaveData
         newNonogram.SetWidth(Width);
         newNonogram.SetHeight(Height);
 
-        List<List<GridTile>> gridTiles = new List<List<GridTile>>();
+        List<List<ComplitedTileData>> gridTiles = new List<List<ComplitedTileData>>();
         int tileDataIndex = 0;
         for (int currHeight = 0; currHeight < Height; currHeight++)
         {
-            List<GridTile> tiles = new List<GridTile>();
+            List<ComplitedTileData> tiles = new List<ComplitedTileData>();
             for (int currWidth = 0; currWidth < Width; currWidth++)
             {
-                GridTile tile = new GridTile();
-                tile.SetHeightIndex(currHeight);
-                tile.SetWidthIndex(currWidth);
+                ComplitedTileData tile = new ComplitedTileData();
+                tile.m_HeightIndex = currHeight;
+                tile.m_WidthIndex = currWidth;
 
                 TileColorSaveData tileData = TileSaveData[tileDataIndex];
                 Color newColor = new Color(tileData.r, tileData.g, tileData.b, tileData.a);
-                tile.SetRequiredColor(newColor);
+                tile.m_Color = newColor;
 
                 tiles.Add(tile);
+                tileDataIndex++;
             }
 
             gridTiles.Add(tiles);
         }
 
-        newNonogram.CreateNonogram(gridTiles);
+        newNonogram.AddRequiredColors(gridTiles);
 
         return newNonogram;
     }
