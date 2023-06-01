@@ -498,6 +498,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_GlobalEventsRef: {fileID: 11400000, guid: 4ede90c7bce56204cace37bc111a129d, type: 2}
+  m_GameModes:
+  - {fileID: 5524337109058764133, guid: cb31fb1e329a9644b872967922916b75, type: 3}
+  - {fileID: 7785497451039388398, guid: c7cdc39578769a24e90b83a92bc334df, type: 3}
   m_NonogramSets: []
 --- !u!4 &2093564962
 Transform:

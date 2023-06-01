@@ -27,11 +27,12 @@ public enum ETileDecoration
     TopRightSeparator
 }
 
-public struct ComplitedTileData
+public class ComplitedTileData
 {
-    public Color m_Color;
-    public int m_WidthIndex;
-    public int m_HeightIndex;
+    public Color m_Color = Color.white;
+    public int m_WidthIndex = 0;
+    public int m_HeightIndex = 0;
+    public bool m_IsEmpty = true;
 }
 
 [RequireComponent(typeof(ExpandedButton))]
@@ -75,6 +76,7 @@ public class GridTile : MonoBehaviour
     {
         m_ForegroundImageComponent.color = color;
         m_ForegroundImageComponent.enabled = true;
+        SetIsEmpty(false);
     }
 
     public ETileState GetTileState() { return m_TileState; }

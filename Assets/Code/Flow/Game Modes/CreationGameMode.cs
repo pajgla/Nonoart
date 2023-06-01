@@ -53,7 +53,7 @@ public class CreationGameMode : GameMode
         m_ControlBarViewModel = ViewModelHelper.SpawnAndInitialize(m_ControlBarViewModelRef);
         m_ControlBarViewModel.GetCreateButton().onClick.AddListener(OnCreateButtonClickedCallback);
 
-        StartCoroutine(m_GridSpawner.SpawnGrid(m_GridWidth, m_GridHeight));
+        StartCoroutine(m_GridSpawner.SpawnEmptyGrid(m_GridWidth, m_GridHeight));
     }
 
     private void OnCreateButtonClickedCallback()

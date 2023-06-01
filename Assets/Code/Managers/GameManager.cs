@@ -7,7 +7,7 @@ public class GameManager : BaseSingleton<GameManager>
 {
     [Header("References")]
     [SerializeField] GlobalEvents m_GlobalEventsRef = null;
-    List<GameMode> m_GameModes = new List<GameMode>();
+    [SerializeField] List<GameMode> m_GameModes = new List<GameMode>();
 
     [SerializeField] List<NonogramSet> m_NonogramSets = new List<NonogramSet>();
 
@@ -18,18 +18,27 @@ public class GameManager : BaseSingleton<GameManager>
         m_NonogramSets = NonogramHelpers.LoadAllNonograms();
     }
 
-    public void StartGameMode(EGameModeType gameModeType)
+    public void StartGameMode(EGameModeType gameModeType, GameModeData gameModeData)
     {
-        StartCoroutine(LoadGameModeSceneAsync(gameModeType));
+        StartCoroutine(LoadGameModeSceneAsync(gameModeType, gameModeData));
     }
 
-    private IEnumerator LoadGameModeSceneAsync(EGameModeType gameModeType)
+    private IEnumerator LoadGameModeSceneAsync(EGameModeType gameModeType, GameModeData gameModeData)
     {
         //#TODO:
         //-loading screen or fade in/fade out transition
         //-Use build index or something better instead of strings
-
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Nonogram Level");
+        string sceneName = "";
+        switch (gameModeType)
+        {
+            case EGameModeType.Creation:
+                sceneName = "Nonogram Creation Scene";
+                break;
+            case EGameModeType.Solving:
+                sceneName = "Nonogram Level";
+                break;
+        }
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
 
         //Wait until the async scene fully loads
         while (!asyncLoad.isDone)
@@ -58,11 +67,7 @@ public class GameManager : BaseSingleton<GameManager>
 
         GameMode newGameModeObj = Instantiate(foundGameModeRef);
         m_CurrentGameMode = newGameModeObj;
-    }
-
-    public bool IsInGameMode()
-    {
-        return m_CurrentGameMode != null;
+        m_CurrentGameMode.Init(gameModeData);
     }
 
     //Getters

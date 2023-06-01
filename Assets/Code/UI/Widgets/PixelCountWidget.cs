@@ -31,7 +31,12 @@ public class PixelCountWidget : MonoBehaviour
     public void AddPixelCount(int count)
     {
         GameObject newObject = Instantiate(m_PixelCountTextPrefab);
-        newObject.transform.SetParent(transform);
+        newObject.transform.SetParent(transform, false);
+
+        if (m_IsVertical)
+        {
+            newObject.GetComponent<RectTransform>().Rotate(new Vector3(0.0f, 0.0f, 90.0f));
+        }
 
         TMPro.TextMeshProUGUI textComponent = newObject.GetComponent<TMPro.TextMeshProUGUI>();
         if (textComponent == null)

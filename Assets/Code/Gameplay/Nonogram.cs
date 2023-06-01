@@ -24,7 +24,9 @@ public class Nonogram
 
             for (int j = 0; j < width; j++)
             {
-                m_GridTiles[i].Add(new GridTile());
+                GridTile newTile = new GridTile();
+                newTile.SetIsEmpty(true);
+                m_GridTiles[i].Add(newTile);
             }
         }
     }
@@ -63,7 +65,19 @@ public class Nonogram
         {
             for (int width = 0; width < m_Width; ++width)
             {
-                newTexture.SetPixel(width, height, m_ComplitionTiles[height][width].m_Color);
+                ComplitedTileData complitedTileData = m_ComplitionTiles[height][width];
+                Color colorToUse = Color.white;
+                if (complitedTileData.m_IsEmpty)
+                {
+                    colorToUse = Color.white;
+                    colorToUse.a = 0.0f;
+                }
+                else
+                {
+                    colorToUse = complitedTileData.m_Color;
+                }
+
+                newTexture.SetPixel(width, height, colorToUse);
             }
         }
 
@@ -76,6 +90,7 @@ public class Nonogram
     public int GetHeight() { return m_Height; }
     public void SetWidth(int width) {  m_Width = width; }
     public void SetHeight(int height) {  m_Height = height; }
+    public List<List<ComplitedTileData>> GetComplitedTilesData() { return m_ComplitionTiles;}
 }
 
 [Serializable]
@@ -102,6 +117,7 @@ public class NonogramSaveData
         public float g;
         public float b;
         public float a;
+        public bool IsEmpty;
     }
 
     //Members are saved as json so keep names simple and without prefixes
@@ -128,6 +144,7 @@ public class NonogramSaveData
                 data.g = tileColor.g;
                 data.b = tileColor.b;
                 data.a = tileColor.a;
+                data.IsEmpty = tile.GetIsEmpty();
 
                 TileSaveData.Add(data);
             }
@@ -163,7 +180,7 @@ public class NonogramSaveData
                 TileColorSaveData tileData = TileSaveData[tileDataIndex];
                 Color newColor = new Color(tileData.r, tileData.g, tileData.b, tileData.a);
                 tile.m_Color = newColor;
-
+                tile.m_IsEmpty = tileData.IsEmpty;
                 tiles.Add(tile);
                 tileDataIndex++;
             }

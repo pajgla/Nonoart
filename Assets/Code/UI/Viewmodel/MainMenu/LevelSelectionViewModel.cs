@@ -46,7 +46,16 @@ namespace UIViewModel
                 LevelSelectionWidget newWidget = Instantiate(m_LevelSelectionWidgetPrefab);
                 newWidget.SetLevelImage(nonogram.ConvertToTexture());
                 newWidget.transform.SetParent(m_LevelsHolder, false);
+                newWidget.SetNonogram(nonogram);
+                newWidget.OnLevelSelectedEvent += OnLevelSelected;
             }
+        }
+
+        private void OnLevelSelected(Nonogram nonogram)
+        {
+            GameModeData gameModeData = new GameModeData();
+            gameModeData.m_Nonogram = nonogram;
+            GameManager.Get().StartGameMode(EGameModeType.Solving, gameModeData);
         }
     }
 }

@@ -29,7 +29,8 @@ public class MainMenuController : MonoBehaviour
 
     private void OnGoToLevelCreationButtonCallback()
     {
-        SceneManager.LoadScene("Nonogram Creation Scene");
+        GameModeData dummy = new GameModeData();
+        GameManager.Get().StartGameMode(EGameModeType.Creation, dummy);
     }
 
     // Update is called once per frame

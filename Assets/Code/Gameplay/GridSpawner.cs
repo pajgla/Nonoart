@@ -35,7 +35,88 @@ public class GridSpawner : MonoBehaviour
         m_GridViewModel = ViewModelHelper.SpawnAndInitialize(m_GridViewModelRef) as GridViewModel;
     }
 
-    public IEnumerator SpawnGrid(int gridWidth, int gridHeight)
+    public IEnumerator SpawnGrid(Nonogram nonogram)
+    {
+        m_GridWidth = nonogram.GetWidth();
+        m_GridHeight = nonogram.GetHeight();
+
+        RectTransform gridHolder = m_GridViewModel.GetGridHolder();
+
+        RectTransform rectTransform = m_TilePrefab.GetComponent<RectTransform>();
+
+        Vector2 spawnPos = Vector2.zero;
+        spawnPos.y = -((rectTransform.sizeDelta.y * m_GridHeight) / 2 + rectTransform.sizeDelta.y / 2);
+
+        List<List<ComplitedTileData>> complitedTilesData = nonogram.GetComplitedTilesData();
+
+        for (int height = 1; height <= m_GridHeight; height++)
+        {
+            int currentColumn = height - 1;
+            m_GridTiles.Add(new List<GridTile>());
+
+            spawnPos.y += rectTransform.sizeDelta.y;
+            spawnPos.x = -((rectTransform.sizeDelta.x * m_GridWidth) / 2 - rectTransform.sizeDelta.x / 2);
+            if (height > 1)
+            {
+                int columnToCheck = height - 2;
+                int rowToCheck = 0;
+
+                if (m_GridTiles[columnToCheck][rowToCheck].GetTileBackgroundColor() == m_CurrentTileColor)
+                {
+                    ChangeNextTileColor();
+                }
+            }
+
+            for (int width = 1; width <= m_GridWidth; ++width)
+            {
+                GridTile newTile = Instantiate(m_TilePrefab, Vector3.zero, Quaternion.identity);
+                newTile.transform.SetParent(gridHolder);
+                newTile.transform.localScale = Vector3.one;
+                newTile.GetComponent<RectTransform>().anchoredPosition = spawnPos;
+                newTile.SetWidthIndex(width);
+                newTile.SetHeightIndex(height);
+
+                ETileDecoration decoration = ETileDecoration.None;
+                if (height % 5 == 0 && width % 5 == 0)
+                {
+                    decoration = ETileDecoration.TopRightSeparator;
+                }
+                else if (width % 5 == 0)
+                {
+                    decoration = ETileDecoration.RightSeparator;
+                }
+                else if (height % 5 == 0)
+                {
+                    decoration = ETileDecoration.TopSeparator;
+                }
+
+                SetTileImage(newTile, m_CurrentTileColor, decoration);
+                newTile.SetTileBackgroundColor(m_CurrentTileColor);
+
+                ChangeNextTileColor();
+
+                ComplitedTileData complitedTileData = complitedTilesData[height - 1][width - 1];
+                if (complitedTileData.m_IsEmpty)
+                {
+                    newTile.SetIsEmpty(true);
+                }
+                else
+                {
+                    newTile.SetRequiredColor(complitedTileData.m_Color);
+                }
+
+                m_GridTiles[currentColumn].Add(newTile);
+                spawnPos.x += rectTransform.sizeDelta.x;
+
+                yield return new WaitForSeconds(m_TileSpawnCooldown);
+            }
+        }
+
+        SpawnPixelCountWidgets();
+        TriggerOnGridSpawnedEvent();
+    }
+
+    public IEnumerator SpawnEmptyGrid(int gridWidth, int gridHeight)
     {
         m_GridWidth = gridWidth;
         m_GridHeight = gridHeight;
@@ -47,16 +128,16 @@ public class GridSpawner : MonoBehaviour
         Vector2 spawnPos = Vector2.zero;
         spawnPos.y = -((rectTransform.sizeDelta.y * gridHeight) / 2 + rectTransform.sizeDelta.y / 2);
 
-        for (int i = 1; i <= gridHeight; i++)
+        for (int height = 1; height <= gridHeight; height++)
         {
-            int currentColumn = i - 1;
+            int currentColumn = height - 1;
             m_GridTiles.Add(new List<GridTile>());
 
             spawnPos.y += rectTransform.sizeDelta.y;
             spawnPos.x = -((rectTransform.sizeDelta.x * gridWidth) / 2 - rectTransform.sizeDelta.x / 2);
-            if (i > 1)
+            if (height > 1)
             {
-                int columnToCheck = i - 2;
+                int columnToCheck = height - 2;
                 int rowToCheck = 0;
 
                 if (m_GridTiles[columnToCheck][rowToCheck].GetTileBackgroundColor() == m_CurrentTileColor)
@@ -65,25 +146,26 @@ public class GridSpawner : MonoBehaviour
                 }
             }
 
-            for (int j = 1; j <= gridWidth; ++j)
+            for (int width = 1; width <= gridWidth; ++width)
             {
                 GridTile newTile = Instantiate(m_TilePrefab, Vector3.zero, Quaternion.identity);
                 newTile.transform.SetParent(gridHolder);
                 newTile.transform.localScale = Vector3.one;
                 newTile.GetComponent<RectTransform>().anchoredPosition = spawnPos;
-                newTile.SetWidthIndex(j);
-                newTile.SetHeightIndex(i);
+                newTile.SetWidthIndex(width);
+                newTile.SetHeightIndex(height);
+                newTile.SetIsEmpty(true);
 
                 ETileDecoration decoration = ETileDecoration.None;
-                if (i % 5 == 0 && j % 5 == 0)
+                if (height % 5 == 0 && width % 5 == 0)
                 {
                     decoration = ETileDecoration.TopRightSeparator;
                 }
-                else if (j % 5 == 0)
+                else if (width % 5 == 0)
                 {
                     decoration = ETileDecoration.RightSeparator;
                 }
-                else if (i % 5 == 0)
+                else if (height % 5 == 0)
                 {
                     decoration = ETileDecoration.TopSeparator;
                 }
@@ -138,6 +220,11 @@ public class GridSpawner : MonoBehaviour
                     }
                 }
             }
+
+            if (isCounting)
+            {
+                pixelCountWidget.AddPixelCount(counter);
+            }
         }
 
         for (int width = 0; width < m_GridHeight; width++)
@@ -150,9 +237,9 @@ public class GridSpawner : MonoBehaviour
             //Count pixels
             int counter = 0;
             bool isCounting = false;
-            for (int i = 0; i < m_GridWidth; i++)
+            for (int i = m_GridHeight - 1; i >= 0; --i)
             {
-                GridTile currTile = m_GridTiles[m_GridHeight - 1][i];
+                GridTile currTile = m_GridTiles[i][width];
                 if (!currTile.GetIsEmpty())
                 {
                     if (isCounting)
@@ -172,6 +259,11 @@ public class GridSpawner : MonoBehaviour
                         counter = 0;
                     }
                 }
+            }
+
+            if (isCounting)
+            {
+                pixelCountWidget.AddPixelCount(counter);
             }
         }
     }
