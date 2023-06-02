@@ -69,7 +69,7 @@ public class GridTile : MonoBehaviour
     public void SetRequiredColor(Color color) 
     {
         m_RequiredColor = color;
-        
+        SetIsColored(true);
     }
 
     public void Paint(Color color)
