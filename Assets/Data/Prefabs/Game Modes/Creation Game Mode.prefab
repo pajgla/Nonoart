@@ -50,4 +50,5 @@ MonoBehaviour:
   m_ColorPickerViewModelRef: {fileID: 6934744986928190336, guid: d2b7a8fba16c2c24d89171ce037f1710, type: 3}
   m_ConfigurationViewModelRef: {fileID: 5086022923512234724, guid: ab03c91eea86464408da2a382119cf08, type: 3}
   m_ControlBarViewModelRef: {fileID: 7247293075849220797, guid: 70375e76c2d72eb4982b803226ead062, type: 3}
-  m_LineDrawing: 0
+  m_NonogramConfigScreenViewModelRef: {fileID: 0}
+  m_LineDrawing: 1

@@ -19,7 +19,7 @@ public class CreationGameMode : GameMode
     NonogramConfigScreenViewModel m_NonogramConfigScreenViewModel = null;
 
     GridMovementController m_GridMovementController = null;
-    GridSpawner m_GridSpawner = null;
+    GridController m_GridSpawner = null;
 
     //Line drawing
     [SerializeField] bool m_LineDrawing = false;
@@ -31,7 +31,7 @@ public class CreationGameMode : GameMode
     {
         GameManager.Get().GetGlobalEvents().e_OnTileClicked += OnTileClicked;
 
-        m_GridSpawner = Instantiate(m_GridSpawnerRef);
+        m_GridSpawner = Instantiate(m_GridController);
         m_GridSpawner.Init();
 
         m_ConfigurationViewModel = ViewModelHelper.SpawnAndInitialize(m_ConfigurationViewModelRef);
@@ -66,7 +66,16 @@ public class CreationGameMode : GameMode
         //m_NonogramConfigScreenViewModel.GetNewCategoryPanel().SetActive(false);
     }
 
-    private void OnTileClicked(GridTile tile)
+    private void OnTileClicked(GridTile tile, KeyCode keyCode)
+    {
+        if (keyCode == KeyCode.Mouse0)
+        {
+            OnTileLeftMouseClicked(tile);
+        }
+        //#TODO: Middle mouse click
+    }
+
+    private void OnTileLeftMouseClicked(GridTile tile)
     {
         Color selectedColor = m_ColorPickerViewModel.GetSelectedColor();
 
@@ -79,9 +88,7 @@ public class CreationGameMode : GameMode
                 print("Normalized Dir: " + normalizedDir);
                 if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
                 {
-                    tile.SetRequiredColor(selectedColor);
-                    tile.Paint(selectedColor);
-                    return;
+                    PaintTile(tile, selectedColor);
                 }
             }
             else
@@ -95,9 +102,18 @@ public class CreationGameMode : GameMode
                     m_LineDrawingDirection = (new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex()) - m_StartingLineDrawingTilePosition).normalized;
                     m_IsLineDrawingInProgress = true;
                 }
+
+                PaintTile(tile, selectedColor);
             }
         }
-        
+        else
+        {
+            PaintTile(tile, selectedColor);
+        }
+    }
+
+    private void PaintTile(GridTile tile, Color selectedColor)
+    {
         tile.SetRequiredColor(selectedColor);
         tile.Paint(selectedColor);
     }

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2738784136353300164}
   - component: {fileID: 5708781647026819616}
   m_Layer: 0
-  m_Name: Pixel Count Text Widget
+  m_Name: Clue Count
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

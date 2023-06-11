@@ -5,34 +5,36 @@ using UIViewModel;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GridSpawner : MonoBehaviour
+public class GridController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] GridViewModel m_GridViewModelRef = null;
     [SerializeField] GridTilesBackgroundDataset m_GridTilesBackgroundDataset = null;
     [SerializeField] PixelCountWidget m_PixelCountWidget = null;
+    [SerializeField] GridTile m_TilePrefab = null;
 
     GridViewModel m_GridViewModel = null;
 
     [Header("Finetuning")]
     [SerializeField] float m_TileSpawnCooldown = 0.1f;
 
-    [SerializeField] GridTile m_TilePrefab = null;
-
-
     List<List<GridTile>> m_GridTiles = new List<List<GridTile>>();
+    List<PixelCountWidget> m_HorizontalPixelCountWidgets = new List<PixelCountWidget>();
+    List<PixelCountWidget> m_VerticalPixelCountWidgets = new List<PixelCountWidget>();
 
     ETileColor m_CurrentTileColor = ETileColor.White;
 
     int m_GridWidth = 0;
     int m_GridHeight = 0;
 
+    //#TODO: Use Global Events
     public static event EventHandler OnGridSpawnedEvent;
     public static event EventHandler OnTileSpawnedEvent;
 
     public void Init()
     {
         m_GridViewModel = ViewModelHelper.SpawnAndInitialize(m_GridViewModelRef) as GridViewModel;
+        GameManager.Get().GetGlobalEvents().e_OnTilePainted += OnTilePainted;
     }
 
     public IEnumerator SpawnGrid(Nonogram nonogram)
@@ -191,6 +193,7 @@ public class GridSpawner : MonoBehaviour
         for (int height = 0; height < m_GridHeight; height++)
         {
             PixelCountWidget pixelCountWidget = Instantiate(m_PixelCountWidget);
+            //Get the first tile to set the position relative to it
             GridTile tile = m_GridTiles[height][0];
             pixelCountWidget.AdjustPositionRelativeTo(tile.GetComponent<RectTransform>());
 
@@ -225,6 +228,8 @@ public class GridSpawner : MonoBehaviour
             {
                 pixelCountWidget.AddPixelCount(counter);
             }
+
+            m_HorizontalPixelCountWidgets.Add(pixelCountWidget);
         }
 
         for (int width = 0; width < m_GridHeight; width++)
@@ -265,6 +270,8 @@ public class GridSpawner : MonoBehaviour
             {
                 pixelCountWidget.AddPixelCount(counter);
             }
+
+            m_VerticalPixelCountWidgets.Add(pixelCountWidget);
         }
     }
 
@@ -305,5 +312,96 @@ public class GridSpawner : MonoBehaviour
         newNonogram.SetWidth(m_GridWidth);
         newNonogram.SetHeight(m_GridHeight);
         return newNonogram;
+    }
+
+    public void OnTilePainted(GridTile tile)
+    {
+        RefreshPixelCountWidgets(tile.GetWidthIndex(), tile.GetHeightIndex());
+    }
+
+    void RefreshPixelCountWidgets(int row, int column)
+    {
+        int counter = 0;
+        int widgetCounter = 0;
+        bool isCounting = false;
+        //Easier to work with true as default
+        bool shouldMarkAsSolved = true;
+        for (int i = 0; i < m_GridWidth; i++)
+        {
+            GridTile currTile = m_GridTiles[column - 1][i];
+            if (currTile.GetIsColored())
+            {
+                if (!isCounting)
+                    isCounting = true;
+
+                if (!currTile.GetIsSolved())
+                {
+                    shouldMarkAsSolved = false;
+                }
+
+                counter++;
+            }
+            else
+            {
+                if (isCounting)
+                {
+                    if (shouldMarkAsSolved)
+                    {
+                        m_HorizontalPixelCountWidgets[column - 1].SetClueSolved(widgetCounter);
+                    }
+                    widgetCounter++;
+                    //Reset to default value
+                    shouldMarkAsSolved = true;
+                    isCounting = false;
+                    counter = 0;
+                }
+            }
+        }
+
+        if (shouldMarkAsSolved && isCounting)
+        {
+            m_HorizontalPixelCountWidgets[column - 1].SetClueSolved(widgetCounter);
+        }
+
+        counter = 0;
+        widgetCounter = 0;
+        isCounting = false;
+        shouldMarkAsSolved = true;
+        for (int i = 0; i < m_GridHeight; i++)
+        {
+            GridTile currTile = m_GridTiles[i][row - 1];
+            if (currTile.GetIsColored())
+            {
+                if (!isCounting)
+                    isCounting = true;
+
+                if (!currTile.GetIsSolved())
+                {
+                    shouldMarkAsSolved = false;
+                }
+
+                counter++;
+            }
+            else
+            {
+                if (isCounting)
+                {
+                    if (shouldMarkAsSolved)
+                    {
+                        m_VerticalPixelCountWidgets[row - 1].SetClueSolved(widgetCounter);
+                    }
+                    widgetCounter++;
+                    //Reset to default value
+                    shouldMarkAsSolved = true;
+                    isCounting = false;
+                    counter = 0;
+                }
+            }
+        }
+
+        if (shouldMarkAsSolved && isCounting)
+        {
+            m_VerticalPixelCountWidgets[row - 1].SetClueSolved(widgetCounter);
+        }
     }
 }

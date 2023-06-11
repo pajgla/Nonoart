@@ -116,4 +116,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 743487a31dd3dd04ebc6008692eb5ba0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PixelCountTextPrefab: {fileID: 1698254376811384327, guid: 6734dd7b1b2fed84baad0135b927f0b9, type: 3}
+  m_ClueTextPrefab: {fileID: 1698254376811384327, guid: 6734dd7b1b2fed84baad0135b927f0b9, type: 3}
+  m_SolvedClueColor: {r: 0.3962264, g: 0.3943574, b: 0.3943574, a: 0.6862745}
+  m_UnsolvedClueColor: {r: 1, g: 1, b: 1, a: 1}
