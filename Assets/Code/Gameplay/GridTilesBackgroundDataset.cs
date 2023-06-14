@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 struct GridTileBackgroundPair
 {
-    public ETileColor color;
+    public ETileBackgroundColor color;
     public ETileDecoration tileDecoration;
     public Sprite tileSprite;
 }
@@ -17,7 +17,7 @@ public class GridTilesBackgroundDataset : ScriptableObject
     [SerializeField]
     List<GridTileBackgroundPair> m_GridTileBackgroundPairs = new List<GridTileBackgroundPair>();
 
-    public Sprite GetAssociatedTileSprite(ETileColor color, ETileDecoration tileDecoration)
+    public Sprite GetAssociatedTileSprite(ETileBackgroundColor color, ETileDecoration tileDecoration)
     {
         foreach (GridTileBackgroundPair pair in m_GridTileBackgroundPairs)
         {

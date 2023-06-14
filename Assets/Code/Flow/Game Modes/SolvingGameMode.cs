@@ -32,7 +32,7 @@ public class SolvingGameMode : GameMode
         m_GridMovementController.Init(m_GridSpawner.GetGridHolder());
 
         m_NonogramToSolve = gameModeData.m_Nonogram;
-        GridController.OnGridSpawnedEvent += OnGridSpawnedCallback;
+        GameManager.Get().GetGlobalEvents().e_OnGridSpawned += OnGridSpawnedCallback;
         StartCoroutine(m_GridSpawner.SpawnGrid(m_NonogramToSolve));
 
         m_GridMovementController.SetCanDrag(true);
@@ -61,7 +61,7 @@ public class SolvingGameMode : GameMode
         m_LineDrawingDirection = Vector2.zero;
     }
 
-    private void OnGridSpawnedCallback(object caller, EventArgs args)
+    private void OnGridSpawnedCallback()
     {
         m_CanDraw = true;
     }
@@ -77,7 +77,6 @@ public class SolvingGameMode : GameMode
         if (m_CanDraw == false || tile.GetIsSolved())
             return;
 
-        print("Clicked");
         if (keyCode == KeyCode.Mouse0)
         {
             OnTileClicked(tile, false);
@@ -88,14 +87,16 @@ public class SolvingGameMode : GameMode
         }
         else if (keyCode == KeyCode.Mouse2)
         {
-            if (!tile.GetIsMarked())
+            if (!tile.GetIsMarked() || !tile.GetIsSolved())
                 MarkTile(tile);
         }
     }
 
     private void MarkTile(GridTile tile)
     {
-        tile.MarkTile(m_MarkSprite);
+        //#TODO: Don't save sprites locally
+        tile.SetForegroundImage(m_MarkSprite);
+        tile.SetIsMarked(true);
     }
 
     private void OnTileClicked(GridTile tile, bool isCrossed)
@@ -143,7 +144,7 @@ public class SolvingGameMode : GameMode
     {
         if (tile.GetIsColored())
         {
-            tile.Paint(tile.GetRequiredColor());
+            tile.Solve(tile.GetRequiredColor());
             tile.SetForegroundImage(m_DefaultTileSprite);
             GameManager.Get().GetGlobalEvents().Invoke_OnTilePainted(tile);
             if (isTileCrossed)

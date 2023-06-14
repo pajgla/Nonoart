@@ -1,22 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
-
-public enum ETileState
-{
-    Unrevealed,
-    Completed
-}
-
-public enum ETileColor
-{
-    White,
-    Gray
-}
 
 public enum ETileDecoration
 {
@@ -26,12 +9,18 @@ public enum ETileDecoration
     TopRightSeparator
 }
 
+public enum ETileBackgroundColor
+{
+    White,
+    Gray
+}
+
 public class ComplitedTileData
 {
     public Color m_Color = Color.white;
     public int m_WidthIndex = 0;
     public int m_HeightIndex = 0;
-    public bool m_IsEmpty = true;
+    public bool m_IsColored = true;
 }
 
 [RequireComponent(typeof(ExpandedButton))]
@@ -40,13 +29,11 @@ public class GridTile : MonoBehaviour
     [SerializeField] Image m_BackgroundImageComponent = null;
     [SerializeField] Image m_ForegroundImageComponent = null;
 
-    [SerializeField] Color m_RequiredColor = Color.white;
-    ETileState m_TileState = ETileState.Unrevealed;
+    Color m_RequiredColor = Color.white;
+    ETileBackgroundColor m_TileBackgroundColor = ETileBackgroundColor.White;
     bool m_IsColored = false;
-    ETileColor m_TileBackgroundColor = ETileColor.White;
     int m_WidthIndex = 0;
     int m_HeightIndex = 0;
-    bool m_IsEmpty = false;
     bool m_IsSolved = false;
     bool m_IsMarked = false;
 
@@ -87,7 +74,6 @@ public class GridTile : MonoBehaviour
         SetRequiredColor(data.m_Color);
         m_WidthIndex = data.m_WidthIndex;
         m_HeightIndex = data.m_HeightIndex;
-        m_TileState = ETileState.Unrevealed;
     }
 
     // Getters and Setters
@@ -98,15 +84,33 @@ public class GridTile : MonoBehaviour
         SetIsColored(true);
     }
 
+    public void Solve(Color color)
+    {
+        if (color != GetRequiredColor())
+        {
+            Debug.LogError("Tried to solve a tile with wrong color");
+            return;
+        }
+        if (GetIsColored() == false)
+        {
+            Debug.LogError("Trying to solve an empty tile");
+            return;
+        }
+
+        m_ForegroundImageComponent.color = color;
+        m_ForegroundImageComponent.enabled = true;
+
+        SetIsMarked(false);
+        SetIsSolved(true);
+    }
+
+    //Used for tile creation
     public void Paint(Color color)
     {
         m_ForegroundImageComponent.color = color;
         m_ForegroundImageComponent.enabled = true;
-        m_IsMarked = false;
-
-        //Used for nonogram creation - we need to notify save system that this tile is not empty
-        SetIsEmpty(false);
-        SetIsSolved(true);
+        SetIsColored(true);
+        SetIsMarked(false);
     }
 
     public void SetForegroundImage(Sprite sprite)
@@ -115,27 +119,18 @@ public class GridTile : MonoBehaviour
         GetForegroundImageComponent().enabled = true;
     }
 
-    public void MarkTile(Sprite sprite)
-    {
-        SetForegroundImage(sprite);
-        m_IsMarked = true;
-    }
-
     public bool GetIsMarked() { return m_IsMarked; }
-    public ETileState GetTileState() { return m_TileState; }
-    public void SetTileState(ETileState state) { m_TileState = state; }
+    public void SetIsMarked(bool isMarked) { m_IsMarked = isMarked; }
     public bool GetIsColored() { return m_IsColored; }
     public void SetIsColored(bool isColored) { m_IsColored = isColored; }
-    public ETileColor GetTileBackgroundColor() { return m_TileBackgroundColor; }
-    public void SetTileBackgroundColor(ETileColor color) { m_TileBackgroundColor = color; }
+    public ETileBackgroundColor GetTileBackgroundColor() { return m_TileBackgroundColor; }
+    public void SetTileBackgroundColor(ETileBackgroundColor color) { m_TileBackgroundColor = color; }
     public int GetWidthIndex() { return m_WidthIndex; }
     public void SetWidthIndex(int index) { m_WidthIndex = index; }
     public int GetHeightIndex() { return m_HeightIndex; }
     public void SetHeightIndex(int index) { m_HeightIndex = index;}
     public Image GetBackgroundImageComponent() { return m_BackgroundImageComponent; }
     public Image GetForegroundImageComponent() { return m_ForegroundImageComponent; }
-    public bool GetIsEmpty() { return m_IsEmpty; }
-    public void SetIsEmpty(bool isEmpty) {  m_IsEmpty = isEmpty; }
     public bool GetIsSolved() { return m_IsSolved; }
     public void SetIsSolved(bool isSolved) { m_IsSolved = isSolved; }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class PixelCountWidget : MonoBehaviour
 {
@@ -13,6 +14,13 @@ public class PixelCountWidget : MonoBehaviour
         {
             m_PixelCount = count;
             m_TextComponent = component;
+        }
+
+        public void UpdateValue(int value)
+        {
+            m_PixelCount = value;
+            m_TextComponent.text = value.ToString();
+            m_TextComponent.gameObject.SetActive(true);
         }
     }
 
@@ -31,6 +39,15 @@ public class PixelCountWidget : MonoBehaviour
         m_IsVertical = isVertical;
     }
 
+    public void DeleteClues()
+    {
+        foreach (ClueInstance clue in m_SpawnedClueInstances)
+        {
+            clue.m_TextComponent.text = string.Empty;
+            clue.m_TextComponent.gameObject.SetActive(false);
+        }
+    }
+
     public void AdjustPositionRelativeTo(RectTransform other)
     {
         RectTransform rectTransformComponent = GetComponent<RectTransform>();
@@ -47,7 +64,7 @@ public class PixelCountWidget : MonoBehaviour
         }
     }
 
-    public void AddPixelCount(int count)
+    public void AddClue(int count)
     {
         GameObject newObject = Instantiate(m_ClueTextPrefab);
         newObject.transform.SetParent(transform, false);
@@ -75,7 +92,7 @@ public class PixelCountWidget : MonoBehaviour
 
     public void SetClueSolved(int clueIndex)
     {
-        if (clueIndex > m_SpawnedClueInstances.Count - 1)
+        if (DoesClueExist(clueIndex) == false)
         {
             Debug.LogError("Invalid clue index provided");
             return;
@@ -83,6 +100,29 @@ public class PixelCountWidget : MonoBehaviour
 
         ClueInstance clue = m_SpawnedClueInstances[clueIndex];
         ChangeClueColor(clue, true);
+    }
+
+    public void SetClueValue(int clueIndex, int value) 
+    {
+        if (!DoesClueExist(clueIndex))
+        {
+            Debug.LogError("Invalid clue index provided");
+            return;
+        }
+
+        m_SpawnedClueInstances[clueIndex].UpdateValue(value);
+    }
+
+    public bool DoesClueExist(int clueIndex)
+    {
+        return clueIndex <= m_SpawnedClueInstances.Count - 1;
+    }
+
+    public bool IsClueHidden(int clueIndex)
+    {
+        if (!DoesClueExist(clueIndex)) return false;
+
+        return m_SpawnedClueInstances[clueIndex].m_TextComponent.gameObject.activeSelf == false;
     }
 
     private void ChangeClueColor(ClueInstance clue, bool isSolved)

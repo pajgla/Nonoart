@@ -45,10 +45,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_GameModeType: 0
-  m_GridSpawnerRef: {fileID: 3136697373508339568, guid: 67d4a68c5e04d03469a5c71d2ecb38dd, type: 3}
+  m_GridController: {fileID: 3136697373508339568, guid: 67d4a68c5e04d03469a5c71d2ecb38dd, type: 3}
   m_GridMovementControllerRef: {fileID: 4107576596352379229, guid: 3f463aac9dda0884795117684c8bc06a, type: 3}
   m_ColorPickerViewModelRef: {fileID: 6934744986928190336, guid: d2b7a8fba16c2c24d89171ce037f1710, type: 3}
   m_ConfigurationViewModelRef: {fileID: 5086022923512234724, guid: ab03c91eea86464408da2a382119cf08, type: 3}
   m_ControlBarViewModelRef: {fileID: 7247293075849220797, guid: 70375e76c2d72eb4982b803226ead062, type: 3}
   m_NonogramConfigScreenViewModelRef: {fileID: 0}
-  m_LineDrawing: 1
+  m_LineDrawing: 0

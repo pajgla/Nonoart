@@ -79,13 +79,17 @@ public class CreationGameMode : GameMode
     {
         Color selectedColor = m_ColorPickerViewModel.GetSelectedColor();
 
+        if (tile.GetRequiredColor() == selectedColor)
+        {
+            return;
+        }
+
         if (m_LineDrawing)
         {
             if (m_IsLineDrawingInProgress)
             {
                 Vector2 currentTilePos = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
                 Vector2 normalizedDir = (currentTilePos - m_StartingLineDrawingTilePosition).normalized;
-                print("Normalized Dir: " + normalizedDir);
                 if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
                 {
                     PaintTile(tile, selectedColor);
@@ -116,6 +120,12 @@ public class CreationGameMode : GameMode
     {
         tile.SetRequiredColor(selectedColor);
         tile.Paint(selectedColor);
+        int row = tile.GetWidthIndex() - 1;
+        int column = tile.GetHeightIndex() - 1;
+        m_GridSpawner.DeleteCluesFromWidget(row, column, false); //Horizontal
+        m_GridSpawner.RefreshPixelCountWidget(row, column, false, true);
+        m_GridSpawner.DeleteCluesFromWidget(row, column, true); //Vertical
+        m_GridSpawner.RefreshPixelCountWidget(row, column, true, true);
     }
 
     private void Update()

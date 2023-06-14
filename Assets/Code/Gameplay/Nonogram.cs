@@ -14,23 +14,6 @@ public class Nonogram
     int m_Width = 0;
     int m_Height = 0;
 
-    public void Initialize(int width, int height)
-    {
-        m_GridTiles.Clear();
-
-        for (int i = 0; i < height; i++)
-        {
-            m_GridTiles.Add(new List<GridTile>());
-
-            for (int j = 0; j < width; j++)
-            {
-                GridTile newTile = new GridTile();
-                newTile.SetIsEmpty(true);
-                m_GridTiles[i].Add(newTile);
-            }
-        }
-    }
-
     public void CreateNonogram(List<List<GridTile>> gridTiles)
     {
         m_GridTiles = new List<List<GridTile>>(gridTiles);
@@ -67,14 +50,14 @@ public class Nonogram
             {
                 ComplitedTileData complitedTileData = m_ComplitionTiles[height][width];
                 Color colorToUse = Color.white;
-                if (complitedTileData.m_IsEmpty)
+                if (complitedTileData.m_IsColored)
                 {
-                    colorToUse = Color.white;
-                    colorToUse.a = 0.0f;
+                    colorToUse = complitedTileData.m_Color;
                 }
                 else
                 {
-                    colorToUse = complitedTileData.m_Color;
+                    colorToUse = Color.white;
+                    colorToUse.a = 0.0f;
                 }
 
                 newTexture.SetPixel(width, height, colorToUse);
@@ -117,13 +100,16 @@ public class NonogramSaveData
         public float g;
         public float b;
         public float a;
-        public bool IsEmpty;
+        public bool IsColored;
     }
 
-    //Members are saved as json so keep names simple and without prefixes
+    //Members are saved as json so keep the names simple and without prefixes
     [SerializeField] List<TileColorSaveData> TileSaveData = new List<TileColorSaveData>();
     [SerializeField] int Width = 0;
     [SerializeField] int Height = 0;
+    //If you change how nonograms are saved or loaded, update the save version accordingly
+    //Please note that changing the Save Version will make all previous unsuported nonograms deprecated
+    [SerializeField] int SaveVersion = 1;
 
     public void Init(Nonogram nonogram)
     {
@@ -144,7 +130,7 @@ public class NonogramSaveData
                 data.g = tileColor.g;
                 data.b = tileColor.b;
                 data.a = tileColor.a;
-                data.IsEmpty = tile.GetIsEmpty();
+                data.IsColored = tile.GetIsColored();
 
                 TileSaveData.Add(data);
             }
@@ -180,7 +166,7 @@ public class NonogramSaveData
                 TileColorSaveData tileData = TileSaveData[tileDataIndex];
                 Color newColor = new Color(tileData.r, tileData.g, tileData.b, tileData.a);
                 tile.m_Color = newColor;
-                tile.m_IsEmpty = tileData.IsEmpty;
+                tile.m_IsColored = tileData.IsColored;
                 tiles.Add(tile);
                 tileDataIndex++;
             }
