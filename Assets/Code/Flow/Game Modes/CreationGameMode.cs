@@ -45,55 +45,34 @@ public class CreationGameMode : GameMode
         m_GridMovementController.Init(m_GridSpawner.GetGridHolder());
 
         m_NonogramConfigScreenViewModel = ViewModelHelper.SpawnAndInitialize(m_NonogramConfigScreenViewModelRef);
-        m_NonogramConfigScreenViewModel.GetCreateNonogramButton().onClick.AddListener(OnConfigScreenCreateNonogramButtonClicked);
-        m_NonogramConfigScreenViewModel.SetSortingLayer("UI");
-        m_NonogramConfigScreenViewModel.ChangeViewModelVisibility(false);
-
-        PopulateCategoriesDropDown();
+        InitializeNonogramConfigScreen();
     }
 
-    private void PopulateCategoriesDropDown()
+    public void InitializeNonogramConfigScreen()
     {
-        TMPro.TMP_Dropdown categoryDropDown = m_NonogramConfigScreenViewModel.GetNonogramCategoryDropDown();
-        categoryDropDown.ClearOptions();
+        m_NonogramConfigScreenViewModel.GetCreateNonogramButton().onClick.AddListener(OnConfigScreenCreateNonogramButtonClicked);
+        m_NonogramConfigScreenViewModel.GetNonogramCategoryDropDown().onValueChanged.AddListener(OnNonogramCategoryChanged);
+        m_NonogramConfigScreenViewModel.GetCreateCategoryButton().onClick.AddListener(OnNewCategoryButtonClicked);
 
-        //Populate nonogram categories
-        List<NonogramSet> nonogramSets = GameManager.Get().GetNonogramSets();
-        List<TMPro.TMP_Dropdown.OptionData> categoryOptionDataList = new List<TMPro.TMP_Dropdown.OptionData>();
-        foreach (NonogramSet set in nonogramSets)
-        {
-            TMPro.TMP_Dropdown.OptionData newOptionData = new TMPro.TMP_Dropdown.OptionData();
-            newOptionData.text = set.GetName();
+        m_NonogramConfigScreenViewModel.PopulateCategoriesDropdown(K_CREATE_NEW_CATEGORY_STRING);
 
-            categoryOptionDataList.Add(newOptionData);
-        }
-
-        //Add create new category option
-        TMPro.TMP_Dropdown.OptionData createNewCategoryOptionData = new TMPro.TMP_Dropdown.OptionData();
-        createNewCategoryOptionData.text = K_CREATE_NEW_CATEGORY_STRING;
-        categoryOptionDataList.Add(createNewCategoryOptionData);
-
-        categoryDropDown.AddOptions(categoryOptionDataList);
-
-        categoryDropDown.onValueChanged.AddListener(OnNonogramCategoryChanged);
+        m_NonogramConfigScreenViewModel.SetSortingLayer("UI");
+        m_NonogramConfigScreenViewModel.ChangeViewModelVisibility(false);
     }
 
     private void OnNonogramCategoryChanged(int optionIndex)
     {
-        string selectedCategoryName = m_NonogramConfigScreenViewModel.GetNonogramCategoryDropDown().captionText.text;
+        string selectedCategoryName = m_NonogramConfigScreenViewModel.GetSelectedCategoryName();
 
         //#TODO: Bit hacky. Find a better place to store info and do this logic
         if (selectedCategoryName == K_CREATE_NEW_CATEGORY_STRING)
         {
             m_NonogramConfigScreenViewModel.GetNewCategoryPanel().SetActive(true);
-            m_NonogramConfigScreenViewModel.GetCreateCategoryButton().onClick.AddListener(OnNewCategoryButtonClicked);
         }
     }
 
     private void OnNewCategoryButtonClicked()
     {
-        m_NonogramConfigScreenViewModel.GetCreateCategoryButton().onClick.RemoveListener(OnNewCategoryButtonClicked);
-
         string categoryName = m_NonogramConfigScreenViewModel.GetNewCategoryNameInputField().text;
         string categoryNameWithTags = "<b>" + categoryName + "</b>";
         //Activate little easter egg
@@ -106,7 +85,7 @@ public class CreationGameMode : GameMode
         {
             //#TODO: notification
             GameManager.Get().LoadNonogramSets();
-            PopulateCategoriesDropDown();
+            m_NonogramConfigScreenViewModel.PopulateCategoriesDropdown(K_CREATE_NEW_CATEGORY_STRING);
             m_NonogramConfigScreenViewModel.GetNewCategoryPanel().SetActive(false);
         }
     }
@@ -135,7 +114,7 @@ public class CreationGameMode : GameMode
     private void OnConfigScreenCreateNonogramButtonClicked()
     {
         string nonogramName = m_NonogramConfigScreenViewModel.GetNonogramNameInputField().text;
-        string nonogramCategory = m_NonogramConfigScreenViewModel.GetNonogramCategoryDropDown().captionText.text;
+        string nonogramCategory = m_NonogramConfigScreenViewModel.GetSelectedCategoryName();
 
         Nonogram newNonogram = m_GridSpawner.CreateNonogram();
         newNonogram.SetNonogramName(nonogramName);
