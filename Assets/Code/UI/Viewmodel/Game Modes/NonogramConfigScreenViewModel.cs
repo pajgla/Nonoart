@@ -19,7 +19,7 @@ namespace UIViewModel
         public GameObject GetNewCategoryPanel() { return m_NewCategoryPanel; }
         public TMPro.TMP_InputField GetNonogramNameInputField() {  return m_NonogramNameInputField; }
         public TMPro.TMP_Dropdown GetNonogramCategoryDropDown() { return m_NonogramCategoryDropDown; }
-        public Button GetCreateNonogramButton() {  return m_CreateCategoryButton; }
+        public Button GetCreateNonogramButton() {  return m_CreateNonogramButton; }
         public TMPro.TMP_InputField GetNewCategoryNameInputField() { return m_NewCategoryNameInputField; }
         public Button GetCreateCategoryButton() {  return m_CreateCategoryButton; }
     }

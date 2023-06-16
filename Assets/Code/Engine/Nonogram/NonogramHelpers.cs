@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -10,24 +9,55 @@ public class NonogramHelpers : MonoBehaviour
 
     public static void SaveNonogram(Nonogram nonogram, string category)
     {
+        if (!DoesDirectoryExist(category))
+        {
+            Debug.LogError("Directory does not exist. This is forbidden. Create the directory before creating nonogram");
+            return;
+        }
+
         NonogramSaveData data = new NonogramSaveData();
         data.Init(nonogram);
 
-        //#TODO: Use nonogramFile category as a new folder
         string nonogramPath = K_DEFAULT_NONOGRAM_DIR + Path.DirectorySeparatorChar + category + Path.DirectorySeparatorChar + nonogram.GetNonogramName() + K_NONOGRAM_FILE_EXTENSION;
         Debug.Log("Saving nonogramFile at: " + nonogramPath);
-
-        //if (!Directory.Exists(nonogramPath)) 
-        //{
-        //    Debug.LogError("Directory does not exist. Create the missing directory before saving the nonogramFile.");
-        //    return;
-        //}
 
         string nonogramJson = JsonUtility.ToJson(data);
         using (StreamWriter writer = new StreamWriter(nonogramPath, false))
         {
             writer.Write(nonogramJson);
         }
+    }
+
+    public static bool DoesDirectoryExist(string directory)
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(K_DEFAULT_NONOGRAM_DIR);
+        DirectoryInfo[] allFolders = directoryInfo.GetDirectories();
+        foreach (DirectoryInfo folder in allFolders)
+        {
+            if (folder.Name == directory)
+                return true;
+        }
+
+        return false;
+    }    
+
+    public static bool CreateNewCategory(string categoryName)
+    {
+        if (string.IsNullOrEmpty(categoryName))
+        {
+            Debug.LogError("Invalid category name provided");
+            return false;
+        }
+
+        if (DoesDirectoryExist(categoryName))
+        {
+            Debug.LogError("Category name already exists");
+            return false;
+        }
+
+        DirectoryInfo directoryInfo = new DirectoryInfo(K_DEFAULT_NONOGRAM_DIR);
+        directoryInfo.CreateSubdirectory(categoryName);
+        return true;
     }
 
     public static List<NonogramSet> LoadAllNonograms()
@@ -41,8 +71,8 @@ public class NonogramHelpers : MonoBehaviour
             Debug.Log("Folder found: " + folder.Name);
 
             FileInfo[] nonograms = folder.GetFiles("*" + K_NONOGRAM_FILE_EXTENSION);
-            if (nonograms.Length == 0)
-                continue;
+            //if (nonograms.Length == 0)
+            //    continue;
 
             NonogramSet newSet = new NonogramSet();
             newSet.SetName(folder.Name);

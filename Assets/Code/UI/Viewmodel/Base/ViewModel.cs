@@ -24,6 +24,13 @@ namespace UIViewModel
         {
             GetViewModelCanvas().enabled = visible;
         }
+
+        //#TODO: Unity doesnt allow exposing sorting layers to members and we also can't know sorting layer's ID so we have
+        //to use strings instead. Find a better solution for this
+        public void SetSortingLayer(string name)
+        {
+            GetViewModelCanvas().sortingLayerName = name;
+        }
     }
 
     public static class ViewModelHelper

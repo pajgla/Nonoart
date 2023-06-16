@@ -15,6 +15,11 @@ public class GameManager : BaseSingleton<GameManager>
 
     private void Start()
     {
+        LoadNonogramSets();
+    }
+
+    public void LoadNonogramSets()
+    {
         m_NonogramSets = NonogramHelpers.LoadAllNonograms();
     }
 

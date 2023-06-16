@@ -2204,7 +2204,7 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 1864859207
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!114 &4770798920999542509
@@ -2259,10 +2259,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6367754773797649a130e0df8fe9754, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CreatePanel: {fileID: 0}
-  m_NewCategoryPanel: {fileID: 0}
-  m_NonogramNameInputField: {fileID: 0}
-  m_NonogramCategoryDropDown: {fileID: 0}
+  m_CreatePanel: {fileID: 3555357272648929957}
+  m_NewCategoryPanel: {fileID: 4804827951429680896}
+  m_NonogramNameInputField: {fileID: 7195482101864092140}
+  m_NonogramCategoryDropDown: {fileID: 263495731602002603}
+  m_CreateNonogramButton: {fileID: 8226358105716622072}
+  m_NewCategoryNameInputField: {fileID: 485172997071294403}
+  m_CreateCategoryButton: {fileID: 7660821146492841493}
 --- !u!1 &5532328587016556200
 GameObject:
   m_ObjectHideFlags: 0
