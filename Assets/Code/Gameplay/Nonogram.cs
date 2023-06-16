@@ -65,7 +65,6 @@ public class Nonogram
         }
 
         newTexture.Apply();
-        File.WriteAllBytes(Application.streamingAssetsPath + Path.DirectorySeparatorChar + "Texture.jpg", newTexture.EncodeToJPG(1));
         return newTexture;
     }
 
