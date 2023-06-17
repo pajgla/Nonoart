@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class NonogramHelpers : MonoBehaviour
 {
@@ -9,6 +13,8 @@ public class NonogramHelpers : MonoBehaviour
 
     public static void SaveNonogram(Nonogram nonogram, string category)
     {
+        Profiler.BeginSample("NonogramHelpers.SaveNonogram");
+
         if (!DoesDirectoryExist(category))
         {
             Debug.LogError("Directory does not exist. This is forbidden. Create the directory before creating nonogram");
@@ -22,10 +28,25 @@ public class NonogramHelpers : MonoBehaviour
         Debug.Log("Saving nonogramFile at: " + nonogramPath);
 
         string nonogramJson = JsonUtility.ToJson(data);
+        string obfuscatedJson = ObfuscateJsonString(nonogramJson);
         using (StreamWriter writer = new StreamWriter(nonogramPath, false))
         {
-            writer.Write(nonogramJson);
+            writer.Write(obfuscatedJson);
         }
+
+        Profiler.EndSample();
+    }
+
+    private static string ObfuscateJsonString(string json)
+    {
+        byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+        return Convert.ToBase64String(jsonBytes);
+    }
+
+    private static string DeobfuscateJsonString(string obfuscatedJson)
+    {
+        byte[] obfuscatedBytes = Convert.FromBase64String(obfuscatedJson);
+        return Encoding.UTF8.GetString(obfuscatedBytes);
     }
 
     public static bool DoesDirectoryExist(string directory)
@@ -62,6 +83,9 @@ public class NonogramHelpers : MonoBehaviour
 
     public static List<NonogramSet> LoadAllNonograms()
     {
+        //Profiling
+        Profiler.BeginSample("NonogramHelper.LoadAllNonograms");
+
         List<NonogramSet> nonogramSets = new List<NonogramSet>();
 
         DirectoryInfo directoryInfo = new DirectoryInfo(K_DEFAULT_NONOGRAM_DIR);
@@ -81,8 +105,9 @@ public class NonogramHelpers : MonoBehaviour
             {
                 using (StreamReader reader = new StreamReader(nonogramFile.FullName))
                 {
-                    string nonogramJson = reader.ReadToEnd();
-                    NonogramSaveData nonogramSaveData = JsonUtility.FromJson<NonogramSaveData>(nonogramJson);
+                    string obfuscatedNonogramJson = reader.ReadToEnd();
+                    string deobfuscatedJson = DeobfuscateJsonString(obfuscatedNonogramJson);
+                    NonogramSaveData nonogramSaveData = JsonUtility.FromJson<NonogramSaveData>(deobfuscatedJson);
                     if (nonogramSaveData == null)
                     {
                         Debug.LogError("Error while trying to read nonogramFile data. The file may be corrupted or invalid");
@@ -102,6 +127,8 @@ public class NonogramHelpers : MonoBehaviour
 
             nonogramSets.Add(newSet);
         }
+
+        Profiler.EndSample();
 
         return nonogramSets;
     }
