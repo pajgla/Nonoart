@@ -64,7 +64,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BackgroundImageComponent: {fileID: 2686281966955847949}
   m_ForegroundImageComponent: {fileID: 3611935998288423143}
-  m_RequiredColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &9061175420914545356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,8 +295,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
+  m_Sprite: {fileID: 21300000, guid: 7b6e5950fa21ce2428252885e3b2689b, type: 3}
+  m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4

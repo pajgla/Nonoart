@@ -49,4 +49,4 @@ MonoBehaviour:
   m_GridMovementControllerRef: {fileID: 4107576596352379229, guid: 3f463aac9dda0884795117684c8bc06a, type: 3}
   m_CrossSprite: {fileID: 21300000, guid: df7c620e312367043a04ce49d1483406, type: 3}
   m_MarkSprite: {fileID: 21300000, guid: e859adfe7771932479a1b1f32ae391e0, type: 3}
-  m_DefaultTileSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_DefaultTileSprite: {fileID: 21300000, guid: 7b6e5950fa21ce2428252885e3b2689b, type: 3}

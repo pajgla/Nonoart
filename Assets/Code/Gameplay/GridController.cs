@@ -318,7 +318,7 @@ public class GridController : MonoBehaviour
         int end = isVertical ? m_GridHeight : m_GridWidth;
         for (int i = 0; i < end; i++)
         {
-            GridTile currentTile = isVertical ? m_GridTiles[i][row] : m_GridTiles[column][i];
+            GridTile currentTile = isVertical ? m_GridTiles[(m_GridHeight - 1) - i][row] : m_GridTiles[column][i];
             if (currentTile.GetIsColored())
             {
                 if (!isCountingTiles)
