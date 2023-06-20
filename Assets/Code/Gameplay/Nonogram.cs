@@ -109,6 +109,7 @@ public class NonogramSaveData
     //If you change how nonograms are saved or loaded, update the save version accordingly
     //Please note that changing the Save Version will make all previous unsuported nonograms deprecated
     [SerializeField] int SaveVersion = 1;
+    [SerializeField] bool IsCompleted = false; 
 
     public void Init(Nonogram nonogram)
     {
