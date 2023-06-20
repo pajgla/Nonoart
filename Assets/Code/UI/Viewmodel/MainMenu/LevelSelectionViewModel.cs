@@ -13,7 +13,9 @@ namespace UIViewModel
         [SerializeField] LevelSelectionWidget m_LevelSelectionWidgetPrefab = null;
         [SerializeField] Sprite m_UncompleteLevelSprite = null;
 
+        NonogramSet m_SelectedNonogramSet = null;
         List<CategorySelectionWidget> m_InstantiatedCategoryWidgets = new List<CategorySelectionWidget>();
+        List<LevelSelectionWidget> m_InstantiatedLevelSelectionWidgets = new List<LevelSelectionWidget>();
 
         public CategorySelectionWidget GetCategorySelectionWidgetPrefab() { return m_CategorySelectionWidgetPrefab; }
 
@@ -42,6 +44,18 @@ namespace UIViewModel
 
         private void OnCategorySelected(NonogramSet set)
         {
+            if (m_SelectedNonogramSet == set)
+            {
+                return;
+            }
+
+            //Delete old widgets
+            foreach (LevelSelectionWidget levelWidget in m_InstantiatedLevelSelectionWidgets)
+            {
+                Destroy(levelWidget.gameObject);
+            }
+            m_InstantiatedLevelSelectionWidgets.Clear();
+
             foreach (Nonogram nonogram in set.GetNonograms())
             {
                 LevelSelectionWidget newWidget = Instantiate(m_LevelSelectionWidgetPrefab);
@@ -56,7 +70,11 @@ namespace UIViewModel
                 newWidget.transform.SetParent(m_LevelsHolder, false);
                 newWidget.SetNonogram(nonogram);
                 newWidget.OnLevelSelectedEvent += OnLevelSelected;
+
+                m_InstantiatedLevelSelectionWidgets.Add(newWidget);
             }
+
+            m_SelectedNonogramSet = set;
         }
 
         private void OnLevelSelected(Nonogram nonogram)
