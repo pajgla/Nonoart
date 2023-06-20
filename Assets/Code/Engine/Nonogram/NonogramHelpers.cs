@@ -9,13 +9,18 @@ using UnityEngine.Profiling;
 public class NonogramHelpers : MonoBehaviour
 {
     private static string K_DEFAULT_NONOGRAM_DIR = Application.streamingAssetsPath;
-    private static string K_NONOGRAM_FILE_EXTENSION = ".nono";
+    private static string K_NONOGRAM_FILE_EXTENSION = "nono";
 
-    public static void SaveNonogram(Nonogram nonogram, string category)
+    public static void SaveNonogram(Nonogram nonogram, string category = null, bool overwrite = false)
     {
         Profiler.BeginSample("NonogramHelpers.SaveNonogram");
 
-        if (!DoesDirectoryExist(category))
+        if (category == null)
+        {
+            category = nonogram.GetNonogramCategory();
+        }
+
+        if (!DoesCategoryExist(category))
         {
             Debug.LogError("Directory does not exist. This is forbidden. Create the directory before creating nonogram");
             return;
@@ -24,7 +29,14 @@ public class NonogramHelpers : MonoBehaviour
         NonogramSaveData data = new NonogramSaveData();
         data.Init(nonogram);
 
-        string nonogramPath = K_DEFAULT_NONOGRAM_DIR + Path.DirectorySeparatorChar + category + Path.DirectorySeparatorChar + nonogram.GetNonogramName() + K_NONOGRAM_FILE_EXTENSION;
+        string nonogramPath = BuildNonogramPath(nonogram.GetNonogramName(), category);
+
+        if (File.Exists(nonogramPath) && overwrite == false)
+        {
+            Debug.LogError("Trying to save nonogram that already exists. This is prevented to avoid accidental data loss. Use \"overwrite = true\" to force it.");
+            return;
+        }
+
         Debug.Log("Saving nonogramFile at: " + nonogramPath);
 
         string nonogramJson = JsonUtility.ToJson(data);
@@ -35,6 +47,11 @@ public class NonogramHelpers : MonoBehaviour
         }
 
         Profiler.EndSample();
+    }
+
+    private static string BuildNonogramPath(string nonogramName, string nonogramCategory)
+    {
+        return K_DEFAULT_NONOGRAM_DIR + Path.DirectorySeparatorChar + nonogramCategory + Path.DirectorySeparatorChar + nonogramName + "." + K_NONOGRAM_FILE_EXTENSION;
     }
 
     private static string ObfuscateJsonString(string json)
@@ -49,7 +66,7 @@ public class NonogramHelpers : MonoBehaviour
         return Encoding.UTF8.GetString(obfuscatedBytes);
     }
 
-    public static bool DoesDirectoryExist(string directory)
+    public static bool DoesCategoryExist(string directory)
     {
         DirectoryInfo directoryInfo = new DirectoryInfo(K_DEFAULT_NONOGRAM_DIR);
         DirectoryInfo[] allFolders = directoryInfo.GetDirectories();
@@ -70,7 +87,7 @@ public class NonogramHelpers : MonoBehaviour
             return false;
         }
 
-        if (DoesDirectoryExist(categoryName))
+        if (DoesCategoryExist(categoryName))
         {
             Debug.LogError("Category name already exists");
             return false;
@@ -94,7 +111,7 @@ public class NonogramHelpers : MonoBehaviour
         {
             Debug.Log("Folder found: " + folder.Name);
 
-            FileInfo[] nonograms = folder.GetFiles("*" + K_NONOGRAM_FILE_EXTENSION);
+            FileInfo[] nonograms = folder.GetFiles("*" + "." + K_NONOGRAM_FILE_EXTENSION);
             //if (nonograms.Length == 0)
             //    continue;
 
@@ -120,8 +137,10 @@ public class NonogramHelpers : MonoBehaviour
                         //Error already present
                         continue;
                     }
-                    newNonogram.SetNonogramName(nonogramFile.Name);
-                    newSet.GetNonograms().Add(newNonogram);
+
+                    string nonogramName = Path.GetFileNameWithoutExtension(nonogramFile.FullName);
+                    newNonogram.SetNonogramName(nonogramName);
+                    newSet.AddNonogram(newNonogram);
                 }
             }
 

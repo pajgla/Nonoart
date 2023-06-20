@@ -29,6 +29,11 @@ public class LevelSelectionWidget : MonoBehaviour
         GetImageComponent().sprite = newSprite;
     }
 
+    public void SetLevelImage(Sprite sprite)
+    {
+        GetImageComponent().sprite = sprite;
+    }
+
     private void OnLevelButtonClick()
     {
         OnLevelSelectedEvent(GetNonogram());

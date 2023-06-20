@@ -15,14 +15,6 @@ public enum ETileBackgroundColor
     Gray
 }
 
-public class ComplitedTileData
-{
-    public Color m_Color = Color.white;
-    public int m_WidthIndex = 0;
-    public int m_HeightIndex = 0;
-    public bool m_IsColored = true;
-}
-
 [RequireComponent(typeof(ExpandedButton))]
 public class GridTile : MonoBehaviour
 {
@@ -102,6 +94,8 @@ public class GridTile : MonoBehaviour
 
         SetIsMarked(false);
         SetIsSolved(true);
+
+        GameManager.Get().GetGlobalEvents().Invoke_OnTileSolved(this);
     }
 
     //Used for tile creation

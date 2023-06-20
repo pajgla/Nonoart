@@ -8,20 +8,30 @@ using UnityEngine.UIElements;
 public class Nonogram
 {
     private string m_NonogramName = "New Nonogram";
-
-    List<List<GridTile>> m_GridTiles = new List<List<GridTile>>();
-    List<List<ComplitedTileData>> m_ComplitionTiles = new List<List<ComplitedTileData>>();
+    private string m_NonogramCategory = "Invalid";
+    List<ComplitedTileData> m_ComplitionTiles = new List<ComplitedTileData>();
     int m_Width = 0;
     int m_Height = 0;
+    bool m_IsCompleted = false;
 
     public void CreateNonogram(List<List<GridTile>> gridTiles)
     {
-        m_GridTiles = new List<List<GridTile>>(gridTiles);
+        foreach (List<GridTile> gridTileList in gridTiles)
+        {
+            foreach (GridTile tile in gridTileList)
+            {
+                if (tile.GetIsColored())
+                {
+                    ComplitedTileData newTileData = new ComplitedTileData(tile);
+                    m_ComplitionTiles.Add(newTileData);
+                }
+            }
+        }
     }
 
-    public void AddRequiredColors(List<List<ComplitedTileData>> data)
+    public void AddRequiredColors(List<ComplitedTileData> data)
     {
-        m_ComplitionTiles = new List<List<ComplitedTileData>>(data);
+        m_ComplitionTiles = new List<ComplitedTileData>(data);
     }
 
     public void SetNonogramName(string name)
@@ -34,11 +44,6 @@ public class Nonogram
         return m_NonogramName;
     }
 
-    public List<List<GridTile>> GetTiles()
-    {
-        return m_GridTiles;
-    }
-
     public Texture2D ConvertToTexture()
     {
         Texture2D newTexture = new Texture2D(m_Width, m_Height, TextureFormat.ARGB32, false);
@@ -48,20 +53,17 @@ public class Nonogram
         {
             for (int width = 0; width < m_Width; ++width)
             {
-                ComplitedTileData complitedTileData = m_ComplitionTiles[height][width];
+                //Set background alpha for each pixel
                 Color colorToUse = Color.white;
-                if (complitedTileData.m_IsColored)
-                {
-                    colorToUse = complitedTileData.m_Color;
-                }
-                else
-                {
-                    colorToUse = Color.white;
-                    colorToUse.a = 0.0f;
-                }
-
+                colorToUse = Color.white;
+                colorToUse.a = 0.0f;
                 newTexture.SetPixel(width, height, colorToUse);
             }
+        }
+
+        foreach (ComplitedTileData tileData in m_ComplitionTiles)
+        {
+            newTexture.SetPixel(tileData.m_WidthIndex - 1, tileData.m_HeightIndex - 1, tileData.m_Color);
         }
 
         newTexture.Apply();
@@ -72,7 +74,33 @@ public class Nonogram
     public int GetHeight() { return m_Height; }
     public void SetWidth(int width) {  m_Width = width; }
     public void SetHeight(int height) {  m_Height = height; }
-    public List<List<ComplitedTileData>> GetComplitedTilesData() { return m_ComplitionTiles;}
+    public List<ComplitedTileData> GetComplitedTilesData() { return m_ComplitionTiles;}
+    public bool GetIsCompleted() { return m_IsCompleted; }
+    public void SetIsCompleted(bool value) { m_IsCompleted = value; }
+    public string GetNonogramCategory() { return m_NonogramCategory; }
+    public void SetNonogramCategory(string value) { m_NonogramCategory = value; }
+}
+
+public class ComplitedTileData
+{
+    public Color m_Color = Color.white;
+    public int m_WidthIndex = 0;
+    public int m_HeightIndex = 0;
+
+    public ComplitedTileData(GridTile tile)
+    {
+        if (tile.GetIsColored() == false)
+        {
+            Debug.LogError("Non-colored tile provided to Complited Tile Data");
+            return;
+        }
+
+        m_Color = tile.GetRequiredColor();
+        m_WidthIndex = tile.GetWidthIndex();
+        m_HeightIndex = tile.GetHeightIndex();
+    }
+
+    public ComplitedTileData() { }
 }
 
 [Serializable]
@@ -88,98 +116,83 @@ public class NonogramSet
 
     public string GetName() { return m_Name; }
     public List<Nonogram> GetNonograms() { return m_Nonograms; }
+
+    public void AddNonogram(Nonogram nonogram)
+    {
+        nonogram.SetNonogramCategory(m_Name);
+        GetNonograms().Add(nonogram);
+    }
 }
 
 public class NonogramSaveData
 {
     [Serializable]
-    public struct TileColorSaveData
+    public struct TileSaveData
     {
+        //Colors
         public float r;
         public float g;
         public float b;
         public float a;
-        public bool IsColored;
+        public int widthIndex;
+        public int heightIndex;
     }
 
-    //Members are saved as json so keep the names simple and without prefixes
-    [SerializeField] List<TileColorSaveData> TileSaveData = new List<TileColorSaveData>();
-    [SerializeField] int Width = 0;
-    [SerializeField] int Height = 0;
+    [SerializeField] List<TileSaveData> m_TileSaveDataList = new List<TileSaveData>();
+    [SerializeField] int m_Width = 0;
+    [SerializeField] int m_Height = 0;
     //If you change how nonograms are saved or loaded, update the save version accordingly
     //Please note that changing the Save Version will make all previous unsuported nonograms deprecated
-    [SerializeField] int SaveVersion = 1;
-    [SerializeField] bool IsCompleted = false; 
+    [SerializeField] int m_SaveVersion = 1;
+    [SerializeField] bool m_IsCompleted = false; 
 
     public void Init(Nonogram nonogram)
     {
-        List<List<GridTile>> allTiles = nonogram.GetTiles();
-        if (allTiles.Count == 0)
+        foreach (ComplitedTileData tileData in nonogram.GetComplitedTilesData())
         {
-            Debug.LogError("Empty nonogram provided");
-            return;
+            Color tileColor = tileData.m_Color;
+            TileSaveData saveData = new TileSaveData();
+            saveData.r = tileColor.r;
+            saveData.g = tileColor.g;
+            saveData.b = tileColor.b;
+            saveData.a = tileColor.a;
+            saveData.widthIndex = tileData.m_WidthIndex;
+            saveData.heightIndex = tileData.m_HeightIndex;
+
+            m_TileSaveDataList.Add(saveData);
         }
 
-        foreach (List<GridTile> row in allTiles)
-        {
-            foreach (GridTile tile in row)
-            {
-                Color tileColor = tile.GetRequiredColor();
-                TileColorSaveData data = new TileColorSaveData();
-                data.r = tileColor.r;
-                data.g = tileColor.g;
-                data.b = tileColor.b;
-                data.a = tileColor.a;
-                data.IsColored = tile.GetIsColored();
-
-                TileSaveData.Add(data);
-            }
-        }
-
-        Width = nonogram.GetWidth();
-        Height = nonogram.GetHeight();
+        m_Width = nonogram.GetWidth();
+        m_Height = nonogram.GetHeight();
+        m_IsCompleted = nonogram.GetIsCompleted();
     }
 
     public Nonogram ConvertToNonogram()
     {
-        if ((Width * Height == TileSaveData.Count) == false)
-        {
-            Debug.LogError("Saved Data is corrupted or invalid.");
-            return null;
-        }
-
         Nonogram newNonogram = new Nonogram();
-        newNonogram.SetWidth(Width);
-        newNonogram.SetHeight(Height);
+        newNonogram.SetWidth(m_Width);
+        newNonogram.SetHeight(m_Height);
 
-        List<List<ComplitedTileData>> gridTiles = new List<List<ComplitedTileData>>();
-        int tileDataIndex = 0;
-        for (int currHeight = 0; currHeight < Height; currHeight++)
+        List<ComplitedTileData> gridTiles = new List<ComplitedTileData>();
+        foreach (TileSaveData tileSaveData in m_TileSaveDataList)
         {
-            List<ComplitedTileData> tiles = new List<ComplitedTileData>();
-            for (int currWidth = 0; currWidth < Width; currWidth++)
-            {
-                ComplitedTileData tile = new ComplitedTileData();
-                tile.m_HeightIndex = currHeight;
-                tile.m_WidthIndex = currWidth;
+            ComplitedTileData newComplitedTileData = new ComplitedTileData();
+            newComplitedTileData.m_WidthIndex = tileSaveData.widthIndex;
+            newComplitedTileData.m_HeightIndex = tileSaveData.heightIndex;
 
-                TileColorSaveData tileData = TileSaveData[tileDataIndex];
-                Color newColor = new Color(tileData.r, tileData.g, tileData.b, tileData.a);
-                tile.m_Color = newColor;
-                tile.m_IsColored = tileData.IsColored;
-                tiles.Add(tile);
-                tileDataIndex++;
-            }
+            Color newColor = new Color(tileSaveData.r, tileSaveData.g, tileSaveData.b, tileSaveData.a);
+            newComplitedTileData.m_Color = newColor;
 
-            gridTiles.Add(tiles);
+            gridTiles.Add(newComplitedTileData);
         }
 
         newNonogram.AddRequiredColors(gridTiles);
+        newNonogram.SetIsCompleted(m_IsCompleted);
 
         return newNonogram;
     }
 
-    public List<TileColorSaveData> GetTileSaveData() { return TileSaveData; }
-    public int GetWidth() { return Width; }
-    public int GetHeight() { return Height; }
+    public List<TileSaveData> GetTileSaveData() { return m_TileSaveDataList; }
+    public int GetWidth() { return m_Width; }
+    public int GetHeight() { return m_Height; }
 }

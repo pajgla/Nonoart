@@ -28,6 +28,8 @@ public class GridController : MonoBehaviour
     int m_GridWidth = 0;
     int m_GridHeight = 0;
 
+    int m_TotalTilesToSolve = 0;
+
     public void Init()
     {
         m_GridViewModel = ViewModelHelper.SpawnAndInitialize(m_GridViewModelRef) as GridViewModel;
@@ -45,8 +47,6 @@ public class GridController : MonoBehaviour
 
         Vector2 spawnPos = Vector2.zero;
         spawnPos.y = -((rectTransform.sizeDelta.y * m_GridHeight) / 2 + rectTransform.sizeDelta.y / 2);
-
-        List<List<ComplitedTileData>> complitedTilesData = nonogram.GetComplitedTilesData();
 
         for (int height = 1; height <= m_GridHeight; height++)
         {
@@ -94,17 +94,18 @@ public class GridController : MonoBehaviour
 
                 ChangeNextTileColor();
 
-                ComplitedTileData complitedTileData = complitedTilesData[height - 1][width - 1];
-                if (complitedTileData.m_IsColored)
-                {
-                    newTile.SetRequiredColor(complitedTileData.m_Color);
-                }
-
                 m_GridTiles[currentColumn].Add(newTile);
                 spawnPos.x += rectTransform.sizeDelta.x;
 
                 yield return new WaitForSeconds(m_TileSpawnCooldown);
             }
+        }
+
+        foreach (ComplitedTileData tileData in nonogram.GetComplitedTilesData())
+        {
+            GridTile tile = m_GridTiles[tileData.m_HeightIndex - 1][tileData.m_WidthIndex - 1];
+            tile.SetRequiredColor(tileData.m_Color);
+            m_TotalTilesToSolve++;
         }
 
         SpawnPixelCountWidgets();
@@ -370,5 +371,10 @@ public class GridController : MonoBehaviour
         {
             widget.AddClue(value);
         }
+    }
+
+    public int GetTotalTilesToSolve()
+    {
+        return m_TotalTilesToSolve;
     }
 }

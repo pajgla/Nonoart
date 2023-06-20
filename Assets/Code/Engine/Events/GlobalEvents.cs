@@ -10,6 +10,7 @@ public class GlobalEvents : ScriptableObject
     // Gameplay
     public event UnityAction<GridTile, KeyCode> e_OnTileClicked;
     public event UnityAction<GridTile> e_OnTilePainted;
+    public event UnityAction<GridTile> e_OnTileSolved;
     public event UnityAction e_OnGridSpawned;
 
     //Logic
@@ -46,5 +47,10 @@ public class GlobalEvents : ScriptableObject
     public void Invoke_OnGridSpawned()
     {
         Invoke_Internal(e_OnGridSpawned);
+    }
+
+    public void Invoke_OnTileSolved(GridTile tile)
+    {
+        Invoke_Internal(e_OnTileSolved, tile);
     }
 }

@@ -11,6 +11,7 @@ namespace UIViewModel
         [SerializeField] Transform m_LevelsHolder = null;
         [SerializeField] CategorySelectionWidget m_CategorySelectionWidgetPrefab = null;
         [SerializeField] LevelSelectionWidget m_LevelSelectionWidgetPrefab = null;
+        [SerializeField] Sprite m_UncompleteLevelSprite = null;
 
         List<CategorySelectionWidget> m_InstantiatedCategoryWidgets = new List<CategorySelectionWidget>();
 
@@ -44,7 +45,14 @@ namespace UIViewModel
             foreach (Nonogram nonogram in set.GetNonograms())
             {
                 LevelSelectionWidget newWidget = Instantiate(m_LevelSelectionWidgetPrefab);
-                newWidget.SetLevelImage(nonogram.ConvertToTexture());
+                if (nonogram.GetIsCompleted())
+                {
+                    newWidget.SetLevelImage(nonogram.ConvertToTexture());
+                }
+                else
+                {
+                    newWidget.SetLevelImage(m_UncompleteLevelSprite);
+                }
                 newWidget.transform.SetParent(m_LevelsHolder, false);
                 newWidget.SetNonogram(nonogram);
                 newWidget.OnLevelSelectedEvent += OnLevelSelected;

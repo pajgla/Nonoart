@@ -15,16 +15,19 @@ public class SolvingGameMode : GameMode
 
     int m_LivesLeft = 3;
     bool m_CanDraw = false;
+    int m_SolvedTiles = 0;
 
     [Header("Sprites")]
     [SerializeField] Sprite m_CrossSprite = null;
     [SerializeField] Sprite m_MarkSprite = null;
     [SerializeField] Sprite m_DefaultTileSprite = null;
 
+
     public override void Init(GameModeData gameModeData)
     {
         base.Init(gameModeData);
 
+        //#TODO: Change names of GridSpawner and GridController
         m_GridSpawner = Instantiate(m_GridController);
         m_GridSpawner.Init();
 
@@ -70,6 +73,23 @@ public class SolvingGameMode : GameMode
     {
         GlobalEvents globalEvents = GameManager.Get().GetGlobalEvents();
         globalEvents.e_OnTileClicked += OnTileClicked;
+        globalEvents.e_OnTileSolved += OnTileSolved;
+    }
+
+    private void OnTileSolved(GridTile tile)
+    {
+        m_SolvedTiles++;
+        if (m_SolvedTiles == m_GridSpawner.GetTotalTilesToSolve())
+        {
+            OnNonogramSolved();
+        }
+    }
+
+    private void OnNonogramSolved()
+    {
+        m_CanDraw = false;
+        m_NonogramToSolve.SetIsCompleted(true);
+        NonogramHelpers.SaveNonogram(m_NonogramToSolve, m_NonogramToSolve.GetNonogramCategory(), true);
     }
 
     private void OnTileClicked(GridTile tile, KeyCode keyCode)
