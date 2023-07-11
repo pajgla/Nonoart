@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UIViewModel;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
 public class GridController : MonoBehaviour
 {
@@ -233,7 +232,7 @@ public class GridController : MonoBehaviour
             //Get the first tile to set the position relative to it
             GridTile tile = isVertical ? m_GridTiles[m_GridHeight - 1][i] : m_GridTiles[i][0];
             RectTransform tileRectTransform = tile.GetComponent<RectTransform>();
-            pixelCountWidget.AdjustPositionRelativeTo(tileRectTransform);
+            pixelCountWidget.AdjustPositionRelativeTo(m_GridViewModel.GetGridHolder(), tileRectTransform);
             int width = isVertical ? i : 0;
             int height = isVertical ? m_GridHeight - 1 : i;
             PopulatePixelCounts(pixelCountWidget, width, height, isVertical);

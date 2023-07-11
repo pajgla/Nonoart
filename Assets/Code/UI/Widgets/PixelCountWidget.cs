@@ -48,20 +48,24 @@ public class PixelCountWidget : MonoBehaviour
         }
     }
 
-    public void AdjustPositionRelativeTo(RectTransform other)
+    public void AdjustPositionRelativeTo(RectTransform parent, RectTransform gridRect)
     {
         RectTransform rectTransformComponent = GetComponent<RectTransform>();
-        rectTransformComponent.SetParent(other, false);
+        rectTransformComponent.SetParent(gridRect, false);
         if (m_IsVertical)
         {
             //#TODO: Remove magic numbers
             rectTransformComponent.Rotate(new Vector3(0.0f, 0.0f, -90.0f));
-            rectTransformComponent.anchoredPosition = new Vector2(0.0f, (rectTransformComponent.sizeDelta.x / 2 + other.sizeDelta.x / 2));
+            rectTransformComponent.anchoredPosition = new Vector2(0.0f, (rectTransformComponent.sizeDelta.x / 2 + gridRect.sizeDelta.x / 2));
         }
         else
         {
-            rectTransformComponent.anchoredPosition = new Vector2(- (rectTransformComponent.sizeDelta.x / 2 + other.sizeDelta.x / 2), 0.0f);
+            rectTransformComponent.anchoredPosition = new Vector2(- (rectTransformComponent.sizeDelta.x / 2 + gridRect.sizeDelta.x / 2), 0.0f);
         }
+        
+        //#HACK: Pixel count will react to clicks because it is a child of a grid, but we cannot assign another parent until we finish all of the position calculations
+        //above, so, once we are done, we can set the proper parent
+        rectTransformComponent.SetParent(parent, true);
     }
 
     public void AddClue(int count)
