@@ -105,6 +105,15 @@ public class GridTile : MonoBehaviour
         m_ForegroundImageComponent.enabled = true;
         SetIsColored(true);
         SetIsMarked(false);
+        SetForegroundImage(null);
+    }
+
+    public void Strip()
+    {
+        SetForegroundImage(null);
+        m_ForegroundImageComponent.enabled = false;
+        SetIsColored(false);
+        SetIsMarked(false);
     }
 
     public void SetForegroundImage(Sprite sprite)

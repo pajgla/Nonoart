@@ -126,9 +126,13 @@ public class CreationGameMode : GameMode
 
     private void OnTileClicked(GridTile tile, KeyCode keyCode)
     {
-        if (keyCode == KeyCode.Mouse0)
+        if (keyCode == KeyCode.Mouse0) // Left click
         {
             OnTileLeftMouseClicked(tile);
+        }
+        else if (keyCode == KeyCode.Mouse1) //Right click
+        {
+            OnTileRightMouseClicked(tile);
         }
         //#TODO: Middle mouse click
     }
@@ -137,7 +141,7 @@ public class CreationGameMode : GameMode
     {
         Color selectedColor = m_ColorPickerViewModel.GetSelectedColor();
 
-        if (tile.GetRequiredColor() == selectedColor)
+        if (tile.GetIsColored() && tile.GetRequiredColor() == selectedColor)
         {
             return;
         }
@@ -174,12 +178,64 @@ public class CreationGameMode : GameMode
         }
     }
 
+    private void OnTileRightMouseClicked(GridTile tile)
+    {
+        if (tile.GetIsColored() == false)
+        {
+            return;
+        }
+
+        if (m_LineDrawing)
+        {
+            if (m_IsLineDrawingInProgress)
+            {
+                Vector2 currentTilePos = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
+                Vector2 normalizedDir = (currentTilePos - m_StartingLineDrawingTilePosition).normalized;
+                if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
+                {
+                    StripTile(tile);
+                }
+            }
+            else
+            {
+                if (m_StartingLineDrawingTilePosition == Vector2.zero)
+                {
+                    m_StartingLineDrawingTilePosition = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
+                }
+                else
+                {
+                    m_LineDrawingDirection = (new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex()) - m_StartingLineDrawingTilePosition).normalized;
+                    m_IsLineDrawingInProgress = true;
+                }
+
+                StripTile(tile);
+            }
+        }
+        else
+        {
+            StripTile(tile);
+        }
+    }
+
     private void PaintTile(GridTile tile, Color selectedColor)
     {
         tile.SetRequiredColor(selectedColor);
         tile.Paint(selectedColor);
         int row = tile.GetWidthIndex() - 1;
         int column = tile.GetHeightIndex() - 1;
+        UpdateClues(row, column);
+    }
+
+    private void StripTile(GridTile tile)
+    {
+        tile.Strip();
+        int row = tile.GetWidthIndex() - 1;
+        int column = tile.GetHeightIndex() - 1;
+        UpdateClues(row, column);
+    }
+
+    private void UpdateClues(int row, int column)
+    {
         m_GridSpawner.DeleteCluesFromWidget(row, column, false); //Horizontal
         m_GridSpawner.RefreshPixelCountWidget(row, column, false, true);
         m_GridSpawner.DeleteCluesFromWidget(row, column, true); //Vertical
