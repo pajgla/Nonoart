@@ -7,15 +7,30 @@ namespace UIViewModel
 {
     public class NonogramConfigScreenViewModel : ViewModel
     {
+        [Header("Create Nonogram Panel", order = 1)]
         [SerializeField] GameObject m_CreatePanel = null;
-        [SerializeField] GameObject m_NewCategoryPanel = null;
         [SerializeField] TMPro.TMP_InputField m_NonogramNameInputField = null;
-        [SerializeField] TMPro.TMP_Dropdown m_NonogramCategoryDropDown = null;
         [SerializeField] Button m_CreateNonogramButton = null;
+
+        [Header("New Category Panel")]
+        [SerializeField] GameObject m_NewCategoryPanel = null;
+        [SerializeField] TMPro.TMP_Dropdown m_NonogramCategoryDropDown = null;
         [SerializeField] TMPro.TMP_InputField m_NewCategoryNameInputField = null;
         [SerializeField] Button m_CreateCategoryButton = null;
+        [SerializeField] Button m_CloseNewCategoryPanelButton = null;
 
         //Logic
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            m_CloseNewCategoryPanelButton?.onClick.AddListener(OnCloseNewCategoryPanelButtonClicked);
+        }
+
+        private void OnCloseNewCategoryPanelButtonClicked()
+        {
+            GetNewCategoryPanel().SetActive(false);
+        }
 
         public void PopulateCategoriesDropdown(string newCategoryString)
         {

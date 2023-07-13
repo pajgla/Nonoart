@@ -1,3 +1,4 @@
+using Save;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ public class Nonogram
     List<ComplitedTileData> m_ComplitionTiles = new List<ComplitedTileData>();
     int m_Width = 0;
     int m_Height = 0;
-    bool m_IsCompleted = false;
+    string m_ID = string.Empty;
 
     public void CreateNonogram(List<List<GridTile>> gridTiles)
     {
@@ -43,6 +44,13 @@ public class Nonogram
     {
         return m_NonogramName;
     }
+
+    public void SetNonogramID(string id)
+    {
+        m_ID = id;
+    }
+
+    public string GetNonogramID() { return m_ID; }
 
     public Texture2D ConvertToTexture()
     {
@@ -75,8 +83,6 @@ public class Nonogram
     public void SetWidth(int width) {  m_Width = width; }
     public void SetHeight(int height) {  m_Height = height; }
     public List<ComplitedTileData> GetComplitedTilesData() { return m_ComplitionTiles;}
-    public bool GetIsCompleted() { return m_IsCompleted; }
-    public void SetIsCompleted(bool value) { m_IsCompleted = value; }
     public string GetNonogramCategory() { return m_NonogramCategory; }
     public void SetNonogramCategory(string value) { m_NonogramCategory = value; }
 }
@@ -141,10 +147,10 @@ public class NonogramSaveData
     [SerializeField] List<TileSaveData> m_TileSaveDataList = new List<TileSaveData>();
     [SerializeField] int m_Width = 0;
     [SerializeField] int m_Height = 0;
+    [SerializeField] string m_ID = string.Empty; 
     //If you change how nonograms are saved or loaded, update the save version accordingly
-    //Please note that changing the Save Version will make all previous unsuported nonograms deprecated
+    //Note that changing the Save Version will make all previous unsuported nonograms deprecated
     [SerializeField] int m_SaveVersion = 1;
-    [SerializeField] bool m_IsCompleted = false; 
 
     public void Init(Nonogram nonogram)
     {
@@ -164,7 +170,16 @@ public class NonogramSaveData
 
         m_Width = nonogram.GetWidth();
         m_Height = nonogram.GetHeight();
-        m_IsCompleted = nonogram.GetIsCompleted();
+
+        m_ID = nonogram.GetNonogramID();
+        if (m_ID == string.Empty)
+        {
+            Debug.LogError("Nonogram has invalid ID. Generating a new random ID.");
+            //#HACK: it is hacky but it works
+            string newID = SavegameManager.GenerateUniqueID();
+            m_ID = newID;
+            nonogram.SetNonogramID(newID);
+        }
     }
 
     public Nonogram ConvertToNonogram()
@@ -172,6 +187,8 @@ public class NonogramSaveData
         Nonogram newNonogram = new Nonogram();
         newNonogram.SetWidth(m_Width);
         newNonogram.SetHeight(m_Height);
+        Debug.Assert(m_ID != string.Empty, "Nonogram Save Data has invalid ID");
+        newNonogram.SetNonogramID(m_ID);
 
         List<ComplitedTileData> gridTiles = new List<ComplitedTileData>();
         foreach (TileSaveData tileSaveData in m_TileSaveDataList)
@@ -187,7 +204,6 @@ public class NonogramSaveData
         }
 
         newNonogram.AddRequiredColors(gridTiles);
-        newNonogram.SetIsCompleted(m_IsCompleted);
 
         return newNonogram;
     }

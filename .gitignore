@@ -70,3 +70,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+Assets/FlexibleColorPicker/Materials/FCP_AlphaPreview.mat
+Assets/FlexibleColorPicker/Materials/FCP_APicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_BPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_GPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_HPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_MainPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_Preview.mat
+Assets/FlexibleColorPicker/Materials/FCP_RPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_SPicker.mat
+Assets/FlexibleColorPicker/Materials/FCP_VPicker.mat

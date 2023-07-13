@@ -12,6 +12,11 @@ namespace Save
         public float m_Time = -1.0f;
     }
 
+    public static class SaveRoots
+    {
+        public const string K_SavegameDataRoot = "savegameData";
+    }
+
     public static class GlobalSaveProperties
     {
         //Global save values
@@ -40,7 +45,7 @@ namespace Save
         //#                                                                  #
         //####################################################################
         //Increase if new save/load will not work properly with older saves. For example, if we change the name of one of the savegame properties, it cannot be read
-        //and the player will be stuck in loading screen. Instead, increase the savegame version. Old savegame will be deleted, but the game will still be playable
+        //and the player will be stuck in loading screen. Instead, increase the savegame version and implement different loading logic for different versions, if possible
         int m_SavegameVersion = 1;
 
 
@@ -71,6 +76,7 @@ namespace Save
             else
             {
                 Debug.LogError("Nonogram Save Version is missing. It should be assigned while saving the nonogram");
+                return null;
             }
 
             Save.NonogramCompletionSaveData nonogramSaveData = new Save.NonogramCompletionSaveData();
@@ -80,7 +86,7 @@ namespace Save
             return nonogramSaveData;
         }
 
-        public void SaveGameMode(string nonogramID, Save.NonogramCompletionSaveData saveData, QuickSaveSettings saveSettings = null)
+        public void SaveNonogramData(string nonogramID, Save.NonogramCompletionSaveData saveData, QuickSaveSettings saveSettings = null)
         {
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             ///                                                                                                                            ///
@@ -183,6 +189,11 @@ namespace Save
             {
                 DeleteSavegame(GlobalSaveProperties.K_GlobalSaveRoot);
             }
+        }
+
+        public static string GenerateUniqueID()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

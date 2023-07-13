@@ -1,3 +1,4 @@
+using Save;
 using System.Collections.Generic;
 using UIViewModel;
 using UnityEngine;
@@ -116,8 +117,10 @@ public class CreationGameMode : GameMode
         string nonogramName = m_NonogramConfigScreenViewModel.GetNonogramNameInputField().text;
         string nonogramCategory = m_NonogramConfigScreenViewModel.GetSelectedCategoryName();
 
+        string newID = SavegameManager.GenerateUniqueID();
         Nonogram newNonogram = m_GridSpawner.CreateNonogram();
         newNonogram.SetNonogramName(nonogramName);
+        newNonogram.SetNonogramID(newID);
         NonogramHelpers.SaveNonogram(newNonogram, nonogramCategory);
 
         m_NonogramConfigScreenViewModel.GetNonogramNameInputField().text = string.Empty;

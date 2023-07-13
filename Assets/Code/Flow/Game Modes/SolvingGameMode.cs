@@ -1,3 +1,4 @@
+using Save;
 using System;
 using UnityEngine;
 
@@ -88,8 +89,13 @@ public class SolvingGameMode : GameMode
     private void OnNonogramSolved()
     {
         m_CanDraw = false;
-        m_NonogramToSolve.SetIsCompleted(true);
-        NonogramHelpers.SaveNonogram(m_NonogramToSolve, m_NonogramToSolve.GetNonogramCategory(), true);
+        string nonogramID = m_NonogramToSolve.GetNonogramID();
+
+        NonogramCompletionSaveData saveData = new NonogramCompletionSaveData();
+        saveData.m_IsCompleted = true;
+        //#TODO: Implement time tracking
+
+        SavegameManager.Get().SaveNonogramData(nonogramID, saveData);
     }
 
     private void OnTileClicked(GridTile tile, KeyCode keyCode)

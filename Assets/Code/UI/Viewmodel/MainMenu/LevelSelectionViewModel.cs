@@ -1,3 +1,4 @@
+using Save;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -59,7 +60,14 @@ namespace UIViewModel
             foreach (Nonogram nonogram in set.GetNonograms())
             {
                 LevelSelectionWidget newWidget = Instantiate(m_LevelSelectionWidgetPrefab);
-                if (nonogram.GetIsCompleted())
+                bool isCompleted = false;
+                if (SavegameManager.Get().CheckIfNonogramSaveExists(nonogram.GetNonogramID()))
+                {
+                    NonogramCompletionSaveData saveData = SavegameManager.Get().LoadNonogramData(nonogram.GetNonogramID());
+                    isCompleted = saveData != null && saveData.m_IsCompleted;
+                }
+
+                if (isCompleted)
                 {
                     newWidget.SetLevelImage(nonogram.ConvertToTexture());
                 }
