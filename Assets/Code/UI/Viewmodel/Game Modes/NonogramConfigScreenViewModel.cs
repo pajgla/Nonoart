@@ -11,10 +11,10 @@ namespace UIViewModel
         [SerializeField] GameObject m_CreatePanel = null;
         [SerializeField] TMPro.TMP_InputField m_NonogramNameInputField = null;
         [SerializeField] Button m_CreateNonogramButton = null;
+        [SerializeField] TMPro.TMP_Dropdown m_NonogramCategoryDropDown = null;
 
         [Header("New Category Panel")]
         [SerializeField] GameObject m_NewCategoryPanel = null;
-        [SerializeField] TMPro.TMP_Dropdown m_NonogramCategoryDropDown = null;
         [SerializeField] TMPro.TMP_InputField m_NewCategoryNameInputField = null;
         [SerializeField] Button m_CreateCategoryButton = null;
         [SerializeField] Button m_CloseNewCategoryPanelButton = null;
@@ -30,6 +30,9 @@ namespace UIViewModel
         private void OnCloseNewCategoryPanelButtonClicked()
         {
             GetNewCategoryPanel().SetActive(false);
+
+            //"Create New Category" item will be selected after closing the panel, so we force select the first one
+            GetNonogramCategoryDropDown().value = 0;
         }
 
         public void PopulateCategoriesDropdown(string newCategoryString)
