@@ -52,7 +52,7 @@ public class Nonogram
 
     public string GetNonogramID() { return m_ID; }
 
-    public Texture2D ConvertToTexture()
+    public Texture2D GetAsTexture()
     {
         Texture2D newTexture = new Texture2D(m_Width, m_Height, TextureFormat.ARGB32, false);
 
@@ -73,6 +73,8 @@ public class Nonogram
         {
             newTexture.SetPixel(tileData.m_WidthIndex - 1, tileData.m_HeightIndex - 1, tileData.m_Color);
         }
+
+        newTexture.wrapMode = TextureWrapMode.Clamp;
 
         newTexture.Apply();
         return newTexture;

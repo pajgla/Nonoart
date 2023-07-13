@@ -224,7 +224,7 @@ public class GridController : MonoBehaviour
 
     private void SpawnPixelCountWidgetsPerAxis(bool isVertical)
     {
-        int end = isVertical ? m_GridHeight : m_GridWidth;
+        int end = isVertical ? m_GridWidth : m_GridHeight;
         for (int i = 0; i < end; i++)
         {
             PixelCountWidget pixelCountWidget = Instantiate(m_PixelCountWidget);

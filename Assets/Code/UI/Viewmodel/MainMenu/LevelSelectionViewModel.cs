@@ -2,6 +2,7 @@ using Save;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UIViewModel
 {
@@ -69,7 +70,12 @@ namespace UIViewModel
 
                 if (isCompleted)
                 {
-                    newWidget.SetLevelImage(nonogram.ConvertToTexture());
+                    newWidget.SetLevelImage(nonogram.GetAsTexture());
+                    Image widgetImageComponent = newWidget.GetComponent<Image>();
+                    if (widgetImageComponent != null)
+                    {
+                        widgetImageComponent.preserveAspect = true;
+                    }
                 }
                 else
                 {
