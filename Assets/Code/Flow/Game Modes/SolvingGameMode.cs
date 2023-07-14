@@ -1,6 +1,8 @@
 using Save;
 using System;
+using UIViewModel;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SolvingGameMode : GameMode
 {
@@ -23,6 +25,11 @@ public class SolvingGameMode : GameMode
     [SerializeField] Sprite m_MarkSprite = null;
     [SerializeField] Sprite m_DefaultTileSprite = null;
 
+    [Header("References")]
+    [SerializeField] CelebrationPanelViewModel m_CelebrationPanelViewModelRef = null;
+
+    CelebrationPanelViewModel m_CelebrationPanelViewModel = null;
+
 
     public override void Init(GameModeData gameModeData)
     {
@@ -40,6 +47,10 @@ public class SolvingGameMode : GameMode
         StartCoroutine(m_GridSpawner.SpawnGrid(m_NonogramToSolve));
 
         m_GridMovementController.SetCanDrag(true);
+
+        m_CelebrationPanelViewModel = ViewModelHelper.SpawnAndInitialize(m_CelebrationPanelViewModelRef);
+        m_CelebrationPanelViewModel.ChangeViewModelVisibility(false);
+        m_CelebrationPanelViewModel.GetContinueButton().onClick.AddListener(OnContinueButtonClicked);
     }
 
     private void Update()
@@ -96,6 +107,11 @@ public class SolvingGameMode : GameMode
         //#TODO: Implement time tracking
 
         SavegameManager.Get().SaveNonogramData(nonogramID, saveData);
+
+        m_CelebrationPanelViewModel.SetNonogramName(m_NonogramToSolve.GetNonogramName());
+        m_CelebrationPanelViewModel.SetNonogramTexture(m_NonogramToSolve.GetAsTexture());
+        m_CelebrationPanelViewModel.SetTotalTimeTaken(70);
+        m_CelebrationPanelViewModel.ChangeViewModelVisibility(true);
     }
 
     private void OnTileClicked(GridTile tile, KeyCode keyCode)
@@ -210,5 +226,11 @@ public class SolvingGameMode : GameMode
     private void OnGameOver()
     {
 
+    }
+
+    private void OnContinueButtonClicked()
+    {
+        //#TODO: Make custom scene loader
+        SceneManager.LoadScene(0);
     }
 }
