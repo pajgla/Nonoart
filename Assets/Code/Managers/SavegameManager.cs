@@ -1,7 +1,9 @@
 using CI.QuickSave;
+using CI.QuickSave.Core.Storage;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Save
@@ -172,28 +174,43 @@ namespace Save
             return false;
         }
 
-        public void DeleteSavegame(string nonogramID)
+        public bool DeleteSavegame(string nonogramID)
         {
             if (!QuickSaveBase.CheckIfRootExists(nonogramID))
             {
                 Debug.LogWarning("Savegame with ID " + nonogramID + " does not exist but we are trying to delete it.");
-                return;
+                return false;
             }
 
             QuickSaveBase.DeleteSave(nonogramID);
+            return true;
         }
 
-        public void DeleteRootSaveData()
+        public bool DeleteRootSaveData()
         {
             if (DoesGlobalRootExists())
             {
                 DeleteSavegame(GlobalSaveProperties.K_GlobalSaveRoot);
+                return true;
             }
+
+            return false;
         }
 
         public static string GenerateUniqueID()
         {
             return Guid.NewGuid().ToString();
+        }
+
+        public void DeleteAllSaves(bool includeExtension = false)
+        {
+            IEnumerable<string> files = CI.QuickSave.Core.Storage.FileAccess.Files(includeExtension);
+
+            foreach (string file in files)
+            {
+                string saveName = Path.GetFileName(file);
+                DeleteSavegame(saveName);
+            }
         }
     }
 }

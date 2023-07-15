@@ -233,4 +233,12 @@ public class SolvingGameMode : GameMode
         //#TODO: Make custom scene loader
         SceneManager.LoadScene(0);
     }
+
+#if UNITY_EDITOR
+    public void Solve()
+    {
+        OnNonogramSolved();
+    }
+
+#endif
 }

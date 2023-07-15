@@ -75,7 +75,15 @@ public class GameManager : BaseSingleton<GameManager>
         m_CurrentGameMode.Init(gameModeData);
     }
 
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene(0);
+        m_CurrentGameMode = null;
+    }
+
     //Getters
     public GlobalEvents GetGlobalEvents() { return m_GlobalEventsRef; }
     public List<NonogramSet> GetNonogramSets() { return m_NonogramSets; }
+    public bool IsInGameMode() { return m_CurrentGameMode != null; }
+    public GameMode GetActiveGameMode() { return m_CurrentGameMode; }
 }
