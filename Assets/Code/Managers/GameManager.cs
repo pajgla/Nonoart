@@ -33,16 +33,7 @@ public class GameManager : BaseSingleton<GameManager>
         //#TODO:
         //-loading screen or fade in/fade out transition
         //-Use build index or something better instead of strings
-        string sceneName = "";
-        switch (gameModeType)
-        {
-            case EGameModeType.Creation:
-                sceneName = "Nonogram Creation Scene";
-                break;
-            case EGameModeType.Solving:
-                sceneName = "Nonogram Level";
-                break;
-        }
+        string sceneName = "Nonogram Level";
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
 
         //Wait until the async scene fully loads
@@ -78,6 +69,7 @@ public class GameManager : BaseSingleton<GameManager>
     public void LoadMainMenu()
     {
         SceneManager.LoadScene(0);
+        Destroy(m_CurrentGameMode);
         m_CurrentGameMode = null;
     }
 

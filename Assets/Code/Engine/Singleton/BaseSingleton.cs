@@ -8,9 +8,8 @@ public class BaseSingleton<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual bool Awake()
     {
-        if (m_Instance != null && m_Instance != this)
+        if (m_Instance != null)
         {
-            //Scene loading will cause this warning to be thrown, but it's not a problem
             Destroy(this.gameObject);
             return false;
         }

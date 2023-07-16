@@ -30,7 +30,6 @@ public class SolvingGameMode : GameMode
 
     CelebrationPanelViewModel m_CelebrationPanelViewModel = null;
 
-
     public override void Init(GameModeData gameModeData)
     {
         base.Init(gameModeData);
@@ -231,7 +230,16 @@ public class SolvingGameMode : GameMode
     private void OnContinueButtonClicked()
     {
         //#TODO: Make custom scene loader
-        SceneManager.LoadScene(0);
+        GameManager.Get().LoadMainMenu();
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents globalEvents = GameManager.Get().GetGlobalEvents();
+        m_CelebrationPanelViewModel.GetContinueButton().onClick.RemoveAllListeners();
+        globalEvents.e_OnGridSpawned -= OnGridSpawnedCallback;
+        globalEvents.e_OnTileClicked -= OnTileClicked;
+        globalEvents.e_OnTileSolved -= OnTileSolved;
     }
 
 #if UNITY_EDITOR
