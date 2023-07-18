@@ -12,6 +12,7 @@ public class GameManager : BaseSingleton<GameManager>
     [SerializeField] List<NonogramSet> m_NonogramSets = new List<NonogramSet>();
 
     GameMode m_CurrentGameMode = null;
+    GameModeData m_LastUsedGameModeData;
 
     private void Start()
     {
@@ -61,6 +62,7 @@ public class GameManager : BaseSingleton<GameManager>
             yield return null;
         }
 
+        m_LastUsedGameModeData = gameModeData;
         GameMode newGameModeObj = Instantiate(foundGameModeRef);
         m_CurrentGameMode = newGameModeObj;
         m_CurrentGameMode.Init(gameModeData);
@@ -71,6 +73,17 @@ public class GameManager : BaseSingleton<GameManager>
         SceneManager.LoadScene(0);
         Destroy(m_CurrentGameMode);
         m_CurrentGameMode = null;
+    }
+
+    public void ReloadCurrentLevel()
+    {
+        if (m_CurrentGameMode == null)
+        {
+            Debug.LogError("Trying to reload Main Menu scene. This is not allowed.");
+            return;
+        }
+
+        StartGameMode(m_CurrentGameMode.GetGameModeType(), m_LastUsedGameModeData);
     }
 
     //Getters

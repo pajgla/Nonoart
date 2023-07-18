@@ -17,12 +17,14 @@ public class CreationGameMode : GameMode
     [SerializeField] GridConfigurationViewModel m_ConfigurationViewModelRef = null;
     [SerializeField] ControlBarViewModel m_ControlBarViewModelRef = null;
     [SerializeField] NonogramConfigScreenViewModel m_NonogramConfigScreenViewModelRef = null;
+    [SerializeField] PauseViewModel m_PauseViewModelRef = null;
 
     //View Models
     ColorPickerViewModel m_ColorPickerViewModel = null;
     GridConfigurationViewModel m_ConfigurationViewModel = null;
     ControlBarViewModel m_ControlBarViewModel = null;
     NonogramConfigScreenViewModel m_NonogramConfigScreenViewModel = null;
+    PauseViewModel m_PauseViewModel = null;
 
     GridMovementController m_GridMovementController = null;
     GridController m_GridSpawner = null;
@@ -48,6 +50,13 @@ public class CreationGameMode : GameMode
         m_ControlBarViewModel.ChangeLivesTextVisibility(false);
         m_ControlBarViewModel.ChangeTimeTextVisibility(false);
         m_ControlBarViewModel.GetCreateNonogramButton().onClick.AddListener(OnCreateButtonClickedCallback);
+        m_ControlBarViewModel.GetPauseButton().onClick.AddListener(OnPauseButtonPressed);
+
+        m_PauseViewModel = ViewModelHelper.SpawnAndInitialize(m_PauseViewModelRef);
+        m_PauseViewModel.GetMainMenuButton().onClick.AddListener(OnGoToMainMenuButtonPressed);
+        m_PauseViewModel.GetRestartButton().onClick.AddListener(OnRestartButtonPressed);
+        m_PauseViewModel.GetResumeButton().onClick.AddListener(OnResumeButtonPressed);
+        m_PauseViewModel.ChangeViewModelVisibility(false);
 
         m_DrawingController = new DrawingController();
     }
@@ -62,6 +71,27 @@ public class CreationGameMode : GameMode
 
         m_NonogramConfigScreenViewModel.SetSortingLayer("UI");
         m_NonogramConfigScreenViewModel.ChangeViewModelVisibility(false);
+    }
+
+    private void OnPauseButtonPressed()
+    {
+        m_PauseViewModel.ChangeViewModelVisibility(true);
+    }
+
+    private void OnGoToMainMenuButtonPressed()
+    {
+        //#TODO: Create confirmation screen
+        GameManager.Get().LoadMainMenu();
+    }
+
+    private void OnRestartButtonPressed()
+    {
+        GameManager.Get().ReloadCurrentLevel();
+    }
+
+    private void OnResumeButtonPressed()
+    {
+        m_PauseViewModel.ChangeViewModelVisibility(false);
     }
 
     private void OnNonogramCategoryChanged(int optionIndex)
@@ -199,5 +229,11 @@ public class CreationGameMode : GameMode
     public void OpenColorPicker()
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        GlobalEvents globalEvents = GameManager.Get().GetGlobalEvents();
+        globalEvents.e_OnTileClicked -= OnTileClicked;
     }
 }

@@ -51,3 +51,4 @@ MonoBehaviour:
   m_ConfigurationViewModelRef: {fileID: 5086022923512234724, guid: ab03c91eea86464408da2a382119cf08, type: 3}
   m_ControlBarViewModelRef: {fileID: 1343483618570561105, guid: 4f74ca701727f63408afd76a9dcf39ad, type: 3}
   m_NonogramConfigScreenViewModelRef: {fileID: 3043759692407900470, guid: 23bce915c72dc5f4e84fba51b1cb913b, type: 3}
+  m_PauseViewModelRef: {fileID: 496179983316624350, guid: f8683edc7a87a5a4bb0c7819c0eef9e4, type: 3}

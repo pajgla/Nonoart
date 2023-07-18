@@ -27,10 +27,12 @@ public class SolvingGameMode : GameMode
     [Header("References")]
     [SerializeField] CelebrationPanelViewModel m_CelebrationPanelViewModelRef = null;
     [SerializeField] ControlBarViewModel m_ControlBarViewModelRef = null;
+    [SerializeField] PauseViewModel m_PauseViewModelRef = null;
 
     //Viewmodels
     CelebrationPanelViewModel m_CelebrationPanelViewModel = null;
     ControlBarViewModel m_ControlBarViewModel = null;
+    PauseViewModel m_PauseViewModel = null;
 
     public override void Init(GameModeData gameModeData)
     {
@@ -59,6 +61,13 @@ public class SolvingGameMode : GameMode
         m_ControlBarViewModel.SetDrawingModeImage(DrawingController.EDrawingType.Free);
         m_ControlBarViewModel.SetLives(m_LivesLeft);
         m_ControlBarViewModel.ChangeCreateButtonVisibility(false);
+        m_ControlBarViewModel.GetPauseButton().onClick.AddListener(OnPauseButtonPressed);
+
+        m_PauseViewModel = ViewModelHelper.SpawnAndInitialize(m_PauseViewModelRef);
+        m_PauseViewModel.GetMainMenuButton().onClick.AddListener(OnGoToMainMenuButtonPressed);
+        m_PauseViewModel.GetRestartButton().onClick.AddListener(OnRestartLevelButtonPressed);
+        m_PauseViewModel.GetResumeButton().onClick.AddListener(OnResumeButtonPressed);
+        m_PauseViewModel.ChangeViewModelVisibility(false);
     }
 
     private void Update()
@@ -75,6 +84,30 @@ public class SolvingGameMode : GameMode
         }
 
         UpdateTimeTaken();
+    }
+
+    private void OnResumeButtonPressed()
+    {
+        m_PauseViewModel.ChangeViewModelVisibility(false);
+        m_IsPaused = false;
+        m_CanDraw = true;
+    }
+
+    private void OnRestartLevelButtonPressed()
+    {
+        GameManager.Get().ReloadCurrentLevel();
+    }
+
+    private void OnGoToMainMenuButtonPressed()
+    {
+        GameManager.Get().LoadMainMenu();
+    }
+
+    private void OnPauseButtonPressed()
+    {
+        m_PauseViewModel.ChangeViewModelVisibility(true);
+        m_IsPaused = true;
+        m_CanDraw = false;
     }
 
     private void ToggleLineDrawingMode()
