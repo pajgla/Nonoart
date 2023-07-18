@@ -22,10 +22,10 @@ namespace UIViewModel
             m_NonogramNameText.text = nonogramName;
         }
 
-        public void SetTotalTimeTaken(int totalTimeInSeconds)
+        public void SetTotalTimeTaken(float totalTimeInSeconds)
         {
-            int minutes = totalTimeInSeconds / 60;
-            int seconds = totalTimeInSeconds % 60;
+            float minutes = totalTimeInSeconds / 60;
+            float seconds = totalTimeInSeconds % 60;
 
             string formattedTime = String.Format("{0:00}:{1:00}", minutes, seconds);
 

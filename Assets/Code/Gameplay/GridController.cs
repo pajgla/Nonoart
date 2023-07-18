@@ -376,4 +376,9 @@ public class GridController : MonoBehaviour
     {
         return m_TotalTilesToSolve;
     }
+
+    private void OnDestroy()
+    {
+        GameManager.Get().GetGlobalEvents().e_OnTilePainted -= OnTilePainted;
+    }
 }

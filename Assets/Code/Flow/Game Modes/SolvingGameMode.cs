@@ -9,16 +9,15 @@ public class SolvingGameMode : GameMode
     Nonogram m_NonogramToSolve = null;
     GridController m_GridSpawner = null;
     GridMovementController m_GridMovementController = null;
-
-    //Line drawing
-    bool m_LineDrawing = false;
-    bool m_IsLineDrawingInProgress = false;
-    Vector2 m_StartingLineDrawingTilePosition = Vector2.zero;
-    Vector2 m_LineDrawingDirection = Vector2.zero;
+    DrawingController m_DrawingController = null;
 
     int m_LivesLeft = 3;
     bool m_CanDraw = false;
     int m_SolvedTiles = 0;
+    bool m_IsPaused = false;
+
+    //Time tracking
+    float m_TimeTaken = 0.0f;
 
     [Header("Sprites")]
     [SerializeField] Sprite m_CrossSprite = null;
@@ -27,12 +26,17 @@ public class SolvingGameMode : GameMode
 
     [Header("References")]
     [SerializeField] CelebrationPanelViewModel m_CelebrationPanelViewModelRef = null;
+    [SerializeField] ControlBarViewModel m_ControlBarViewModelRef = null;
 
+    //Viewmodels
     CelebrationPanelViewModel m_CelebrationPanelViewModel = null;
+    ControlBarViewModel m_ControlBarViewModel = null;
 
     public override void Init(GameModeData gameModeData)
     {
         base.Init(gameModeData);
+
+        m_DrawingController = new DrawingController();
 
         //#TODO: Change names of GridSpawner and GridController
         m_GridSpawner = Instantiate(m_GridController);
@@ -50,6 +54,11 @@ public class SolvingGameMode : GameMode
         m_CelebrationPanelViewModel = ViewModelHelper.SpawnAndInitialize(m_CelebrationPanelViewModelRef);
         m_CelebrationPanelViewModel.ChangeViewModelVisibility(false);
         m_CelebrationPanelViewModel.GetContinueButton().onClick.AddListener(OnContinueButtonClicked);
+
+        m_ControlBarViewModel = ViewModelHelper.SpawnAndInitialize(m_ControlBarViewModelRef);
+        m_ControlBarViewModel.SetDrawingModeImage(DrawingController.EDrawingType.Free);
+        m_ControlBarViewModel.SetLives(m_LivesLeft);
+        m_ControlBarViewModel.ChangeCreateButtonVisibility(false);
     }
 
     private void Update()
@@ -57,22 +66,33 @@ public class SolvingGameMode : GameMode
         //#TODO: This will only work on PC. Use new Input System for this
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            m_LineDrawing = !m_LineDrawing;
-            if (m_LineDrawing)
-                ResetLineDrawing();
+            ToggleLineDrawingMode();
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-            ResetLineDrawing();
+            m_DrawingController.ResetLineDrawing();
         }
+
+        UpdateTimeTaken();
     }
 
-    private void ResetLineDrawing()
+    private void ToggleLineDrawingMode()
     {
-        m_IsLineDrawingInProgress = false;
-        m_StartingLineDrawingTilePosition = Vector2.zero;
-        m_LineDrawingDirection = Vector2.zero;
+        if (m_IsPaused) 
+            return;
+
+        DrawingController.EDrawingType currentDrawingMode = m_DrawingController.ToggleDrawingMode();
+        m_ControlBarViewModel.SetDrawingModeImage(currentDrawingMode);
+    }
+
+    private void UpdateTimeTaken()
+    {
+        if (m_IsPaused) 
+            return;
+
+        m_TimeTaken += Time.deltaTime;
+        m_ControlBarViewModel.SetTime(m_TimeTaken);
     }
 
     private void OnGridSpawnedCallback()
@@ -98,6 +118,7 @@ public class SolvingGameMode : GameMode
 
     private void OnNonogramSolved()
     {
+        m_IsPaused = true;
         m_CanDraw = false;
         string nonogramID = m_NonogramToSolve.GetNonogramID();
 
@@ -109,7 +130,7 @@ public class SolvingGameMode : GameMode
 
         m_CelebrationPanelViewModel.SetNonogramName(m_NonogramToSolve.GetNonogramName());
         m_CelebrationPanelViewModel.SetNonogramTexture(m_NonogramToSolve.GetAsTexture());
-        m_CelebrationPanelViewModel.SetTotalTimeTaken(70);
+        m_CelebrationPanelViewModel.SetTotalTimeTaken(m_TimeTaken);
         m_CelebrationPanelViewModel.ChangeViewModelVisibility(true);
     }
 
@@ -142,43 +163,10 @@ public class SolvingGameMode : GameMode
 
     private void OnTileClicked(GridTile tile, bool isCrossed)
     {
-        if (m_LineDrawing && TryLaneDraw(tile))
+        if (m_DrawingController.CanPaintTile(tile))
         {
             PaintOrCrossTile(tile, isCrossed);
         }
-        else
-        {
-            PaintOrCrossTile(tile, isCrossed);
-        }
-    }
-
-    private bool TryLaneDraw(GridTile tile)
-    {
-        if (m_IsLineDrawingInProgress)
-        {
-            Vector2 currentTilePos = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-            Vector2 normalizedDir = (currentTilePos - m_StartingLineDrawingTilePosition).normalized;
-            if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (m_StartingLineDrawingTilePosition == Vector2.zero)
-            {
-                m_StartingLineDrawingTilePosition = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-            }
-            else
-            {
-                m_LineDrawingDirection = (new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex()) - m_StartingLineDrawingTilePosition).normalized;
-                m_IsLineDrawingInProgress = true;
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     private bool PaintOrCrossTile(GridTile tile, bool isTileCrossed)
@@ -213,18 +201,19 @@ public class SolvingGameMode : GameMode
     private void OnWrongGuess()
     {
         m_LivesLeft--;
-
-        //#TODO: Update UI
+        m_ControlBarViewModel.SetLives(m_LivesLeft);
 
         if (m_LivesLeft == 0)
         {
             m_CanDraw = false;
+            OnGameOver();
         }
     }
 
     private void OnGameOver()
     {
-
+        m_IsPaused = true;
+        //#TODO: update UI
     }
 
     private void OnContinueButtonClicked()

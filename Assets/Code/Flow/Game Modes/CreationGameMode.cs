@@ -15,22 +15,18 @@ public class CreationGameMode : GameMode
     [Header("References")]
     [SerializeField] ColorPickerViewModel m_ColorPickerViewModelRef = null;
     [SerializeField] GridConfigurationViewModel m_ConfigurationViewModelRef = null;
-    [SerializeField] CreationControlBarViewModel m_ControlBarViewModelRef = null;
+    [SerializeField] ControlBarViewModel m_ControlBarViewModelRef = null;
     [SerializeField] NonogramConfigScreenViewModel m_NonogramConfigScreenViewModelRef = null;
 
+    //View Models
     ColorPickerViewModel m_ColorPickerViewModel = null;
     GridConfigurationViewModel m_ConfigurationViewModel = null;
-    CreationControlBarViewModel m_ControlBarViewModel = null;
+    ControlBarViewModel m_ControlBarViewModel = null;
     NonogramConfigScreenViewModel m_NonogramConfigScreenViewModel = null;
 
     GridMovementController m_GridMovementController = null;
     GridController m_GridSpawner = null;
-
-    //Line drawing
-    [SerializeField] bool m_LineDrawing = false;
-    bool m_IsLineDrawingInProgress = false;
-    Vector2 m_StartingLineDrawingTilePosition = Vector2.zero;
-    Vector2 m_LineDrawingDirection = Vector2.zero;
+    DrawingController m_DrawingController = null;
 
     private void Start()
     {
@@ -47,6 +43,13 @@ public class CreationGameMode : GameMode
 
         m_NonogramConfigScreenViewModel = ViewModelHelper.SpawnAndInitialize(m_NonogramConfigScreenViewModelRef);
         InitializeNonogramConfigScreen();
+
+        m_ControlBarViewModel = ViewModelHelper.SpawnAndInitialize(m_ControlBarViewModelRef);
+        m_ControlBarViewModel.ChangeLivesTextVisibility(false);
+        m_ControlBarViewModel.ChangeTimeTextVisibility(false);
+        m_ControlBarViewModel.GetCreateNonogramButton().onClick.AddListener(OnCreateButtonClickedCallback);
+
+        m_DrawingController = new DrawingController();
     }
 
     public void InitializeNonogramConfigScreen()
@@ -100,9 +103,6 @@ public class CreationGameMode : GameMode
 
         m_ColorPickerViewModel = ViewModelHelper.SpawnAndInitialize(m_ColorPickerViewModelRef);
 
-        m_ControlBarViewModel = ViewModelHelper.SpawnAndInitialize(m_ControlBarViewModelRef);
-        m_ControlBarViewModel.GetCreateButton().onClick.AddListener(OnCreateButtonClickedCallback);
-
         StartCoroutine(m_GridSpawner.SpawnEmptyGrid(m_GridWidth, m_GridHeight));
     }
 
@@ -144,38 +144,7 @@ public class CreationGameMode : GameMode
     {
         Color selectedColor = m_ColorPickerViewModel.GetSelectedColor();
 
-        if (tile.GetIsColored() && tile.GetRequiredColor() == selectedColor)
-        {
-            return;
-        }
-
-        if (m_LineDrawing)
-        {
-            if (m_IsLineDrawingInProgress)
-            {
-                Vector2 currentTilePos = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-                Vector2 normalizedDir = (currentTilePos - m_StartingLineDrawingTilePosition).normalized;
-                if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
-                {
-                    PaintTile(tile, selectedColor);
-                }
-            }
-            else
-            {
-                if (m_StartingLineDrawingTilePosition == Vector2.zero)
-                {
-                    m_StartingLineDrawingTilePosition = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-                }
-                else
-                {
-                    m_LineDrawingDirection = (new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex()) - m_StartingLineDrawingTilePosition).normalized;
-                    m_IsLineDrawingInProgress = true;
-                }
-
-                PaintTile(tile, selectedColor);
-            }
-        }
-        else
+        if (m_DrawingController.CanPaintTile(tile))
         {
             PaintTile(tile, selectedColor);
         }
@@ -188,33 +157,7 @@ public class CreationGameMode : GameMode
             return;
         }
 
-        if (m_LineDrawing)
-        {
-            if (m_IsLineDrawingInProgress)
-            {
-                Vector2 currentTilePos = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-                Vector2 normalizedDir = (currentTilePos - m_StartingLineDrawingTilePosition).normalized;
-                if (new Vector2(Mathf.Abs(normalizedDir.x), Mathf.Abs(normalizedDir.y)) == new Vector2(Mathf.Abs(m_LineDrawingDirection.x), Mathf.Abs(m_LineDrawingDirection.y)))
-                {
-                    StripTile(tile);
-                }
-            }
-            else
-            {
-                if (m_StartingLineDrawingTilePosition == Vector2.zero)
-                {
-                    m_StartingLineDrawingTilePosition = new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex());
-                }
-                else
-                {
-                    m_LineDrawingDirection = (new Vector2(tile.GetWidthIndex(), tile.GetHeightIndex()) - m_StartingLineDrawingTilePosition).normalized;
-                    m_IsLineDrawingInProgress = true;
-                }
-
-                StripTile(tile);
-            }
-        }
-        else
+        if (m_DrawingController.CanPaintTile(tile) )
         {
             StripTile(tile);
         }
@@ -247,11 +190,9 @@ public class CreationGameMode : GameMode
 
     private void Update()
     {
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
         {
-            m_IsLineDrawingInProgress = false;
-            m_StartingLineDrawingTilePosition = Vector2.zero;
-            m_LineDrawingDirection = Vector2.zero;
+            m_DrawingController.ResetLineDrawing();
         }
     }
 

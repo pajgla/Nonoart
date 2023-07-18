@@ -51,3 +51,4 @@ MonoBehaviour:
   m_MarkSprite: {fileID: 21300000, guid: e859adfe7771932479a1b1f32ae391e0, type: 3}
   m_DefaultTileSprite: {fileID: 21300000, guid: 7b6e5950fa21ce2428252885e3b2689b, type: 3}
   m_CelebrationPanelViewModelRef: {fileID: 7628692132990291280, guid: dd7144109390396428f79a6cfb1da42a, type: 3}
+  m_ControlBarViewModelRef: {fileID: 1343483618570561105, guid: 4f74ca701727f63408afd76a9dcf39ad, type: 3}

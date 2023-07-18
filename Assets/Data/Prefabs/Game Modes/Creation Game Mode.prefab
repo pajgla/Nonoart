@@ -49,6 +49,5 @@ MonoBehaviour:
   m_GridMovementControllerRef: {fileID: 4107576596352379229, guid: 3f463aac9dda0884795117684c8bc06a, type: 3}
   m_ColorPickerViewModelRef: {fileID: 6934744986928190336, guid: d2b7a8fba16c2c24d89171ce037f1710, type: 3}
   m_ConfigurationViewModelRef: {fileID: 5086022923512234724, guid: ab03c91eea86464408da2a382119cf08, type: 3}
-  m_ControlBarViewModelRef: {fileID: 7247293075849220797, guid: 70375e76c2d72eb4982b803226ead062, type: 3}
+  m_ControlBarViewModelRef: {fileID: 1343483618570561105, guid: 4f74ca701727f63408afd76a9dcf39ad, type: 3}
   m_NonogramConfigScreenViewModelRef: {fileID: 3043759692407900470, guid: 23bce915c72dc5f4e84fba51b1cb913b, type: 3}
-  m_LineDrawing: 0
