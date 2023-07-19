@@ -161,6 +161,7 @@ public class SolvingGameMode : DrawingGameMode
 
     protected override void OnDestroy()
     {
+        base.OnDestroy();
         GlobalEvents globalEvents = GameManager.Get().GetGlobalEvents();
         globalEvents.e_OnTileSolved -= OnTileSolved;
     }
