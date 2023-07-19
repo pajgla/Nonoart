@@ -4,7 +4,7 @@ using UIViewModel;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CreationGameMode : GameMode
+public class CreationGameMode : DrawingGameMode
 {
     const string K_CREATE_NEW_CATEGORY_STRING = "<b>Create New Category</b>";
     const string K_EASTER_EGG_CATEGORY_NAME = "Easter Egg Category";
@@ -15,83 +15,36 @@ public class CreationGameMode : GameMode
     [Header("References")]
     [SerializeField] ColorPickerViewModel m_ColorPickerViewModelRef = null;
     [SerializeField] GridConfigurationViewModel m_ConfigurationViewModelRef = null;
-    [SerializeField] ControlBarViewModel m_ControlBarViewModelRef = null;
     [SerializeField] NonogramConfigScreenViewModel m_NonogramConfigScreenViewModelRef = null;
-    [SerializeField] PauseViewModel m_PauseViewModelRef = null;
 
     //View Models
     ColorPickerViewModel m_ColorPickerViewModel = null;
     GridConfigurationViewModel m_ConfigurationViewModel = null;
-    ControlBarViewModel m_ControlBarViewModel = null;
     NonogramConfigScreenViewModel m_NonogramConfigScreenViewModel = null;
-    PauseViewModel m_PauseViewModel = null;
 
-    GridMovementController m_GridMovementController = null;
-    GridController m_GridSpawner = null;
-    DrawingController m_DrawingController = null;
-
-    private void Start()
+    public override void Init(GameModeData gameModeData)
     {
-        GameManager.Get().GetGlobalEvents().e_OnTileClicked += OnTileClicked;
+        base.Init(gameModeData);
+    }
 
-        m_GridSpawner = Instantiate(m_GridController);
-        m_GridSpawner.Init();
+    protected override void InitializeViewModels()
+    {
+        base.InitializeViewModels();
 
         m_ConfigurationViewModel = ViewModelHelper.SpawnAndInitialize(m_ConfigurationViewModelRef);
         m_ConfigurationViewModel.GetStartButton().onClick.AddListener(OnStartButtonPressed);
 
-        m_GridMovementController = Instantiate(m_GridMovementControllerRef);
-        m_GridMovementController.Init(m_GridSpawner.GetGridHolder());
-
         m_NonogramConfigScreenViewModel = ViewModelHelper.SpawnAndInitialize(m_NonogramConfigScreenViewModelRef);
-        InitializeNonogramConfigScreen();
-
-        m_ControlBarViewModel = ViewModelHelper.SpawnAndInitialize(m_ControlBarViewModelRef);
-        m_ControlBarViewModel.ChangeLivesTextVisibility(false);
-        m_ControlBarViewModel.ChangeTimeTextVisibility(false);
-        m_ControlBarViewModel.GetCreateNonogramButton().onClick.AddListener(OnCreateButtonClickedCallback);
-        m_ControlBarViewModel.GetPauseButton().onClick.AddListener(OnPauseButtonPressed);
-
-        m_PauseViewModel = ViewModelHelper.SpawnAndInitialize(m_PauseViewModelRef);
-        m_PauseViewModel.GetMainMenuButton().onClick.AddListener(OnGoToMainMenuButtonPressed);
-        m_PauseViewModel.GetRestartButton().onClick.AddListener(OnRestartButtonPressed);
-        m_PauseViewModel.GetResumeButton().onClick.AddListener(OnResumeButtonPressed);
-        m_PauseViewModel.ChangeViewModelVisibility(false);
-
-        m_DrawingController = new DrawingController();
-    }
-
-    public void InitializeNonogramConfigScreen()
-    {
         m_NonogramConfigScreenViewModel.GetCreateNonogramButton().onClick.AddListener(OnConfigScreenCreateNonogramButtonClicked);
         m_NonogramConfigScreenViewModel.GetNonogramCategoryDropDown().onValueChanged.AddListener(OnNonogramCategoryChanged);
         m_NonogramConfigScreenViewModel.GetCreateCategoryButton().onClick.AddListener(OnNewCategoryButtonClicked);
-
         m_NonogramConfigScreenViewModel.PopulateCategoriesDropdown(K_CREATE_NEW_CATEGORY_STRING);
-
         m_NonogramConfigScreenViewModel.SetSortingLayer("UI");
         m_NonogramConfigScreenViewModel.ChangeViewModelVisibility(false);
-    }
 
-    private void OnPauseButtonPressed()
-    {
-        m_PauseViewModel.ChangeViewModelVisibility(true);
-    }
-
-    private void OnGoToMainMenuButtonPressed()
-    {
-        //#TODO: Create confirmation screen
-        GameManager.Get().LoadMainMenu();
-    }
-
-    private void OnRestartButtonPressed()
-    {
-        GameManager.Get().ReloadCurrentLevel();
-    }
-
-    private void OnResumeButtonPressed()
-    {
-        m_PauseViewModel.ChangeViewModelVisibility(false);
+        m_ControlBarViewModel.ChangeLivesTextVisibility(false);
+        m_ControlBarViewModel.ChangeTimeTextVisibility(false);
+        m_ControlBarViewModel.GetCreateNonogramButton().onClick.AddListener(OnCreateButtonClickedCallback);
     }
 
     private void OnNonogramCategoryChanged(int optionIndex)
@@ -133,7 +86,7 @@ public class CreationGameMode : GameMode
 
         m_ColorPickerViewModel = ViewModelHelper.SpawnAndInitialize(m_ColorPickerViewModelRef);
 
-        StartCoroutine(m_GridSpawner.SpawnEmptyGrid(m_GridWidth, m_GridHeight));
+        StartCoroutine(m_GridController.SpawnEmptyGrid(m_GridWidth, m_GridHeight));
     }
 
     private void OnCreateButtonClickedCallback()
@@ -148,7 +101,7 @@ public class CreationGameMode : GameMode
         string nonogramCategory = m_NonogramConfigScreenViewModel.GetSelectedCategoryName();
 
         string newID = SavegameManager.GenerateUniqueID();
-        Nonogram newNonogram = m_GridSpawner.CreateNonogram();
+        Nonogram newNonogram = m_GridController.CreateNonogram();
         newNonogram.SetNonogramName(nonogramName);
         newNonogram.SetNonogramID(newID);
         NonogramHelpers.SaveNonogram(newNonogram, nonogramCategory);
@@ -157,7 +110,7 @@ public class CreationGameMode : GameMode
         m_NonogramConfigScreenViewModel.ChangeViewModelVisibility(false);
     }
 
-    private void OnTileClicked(GridTile tile, KeyCode keyCode)
+    protected override void OnTileClicked(GridTile tile, KeyCode keyCode)
     {
         if (keyCode == KeyCode.Mouse0) // Left click
         {
@@ -212,28 +165,9 @@ public class CreationGameMode : GameMode
 
     private void UpdateClues(int row, int column)
     {
-        m_GridSpawner.DeleteCluesFromWidget(row, column, false); //Horizontal
-        m_GridSpawner.RefreshPixelCountWidget(row, column, false, true);
-        m_GridSpawner.DeleteCluesFromWidget(row, column, true); //Vertical
-        m_GridSpawner.RefreshPixelCountWidget(row, column, true, true);
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
-        {
-            m_DrawingController.ResetLineDrawing();
-        }
-    }
-
-    public void OpenColorPicker()
-    {
-
-    }
-
-    private void OnDestroy()
-    {
-        GlobalEvents globalEvents = GameManager.Get().GetGlobalEvents();
-        globalEvents.e_OnTileClicked -= OnTileClicked;
+        m_GridController.DeleteCluesFromWidget(row, column, false); //Horizontal
+        m_GridController.RefreshPixelCountWidget(row, column, false, true);
+        m_GridController.DeleteCluesFromWidget(row, column, true); //Vertical
+        m_GridController.RefreshPixelCountWidget(row, column, true, true);
     }
 }
