@@ -76,7 +76,6 @@ public class SolvingGameMode : DrawingGameMode
 
         NonogramCompletionSaveData saveData = new NonogramCompletionSaveData();
         saveData.m_IsCompleted = true;
-        //#TODO: Implement time tracking
 
         SavegameManager.Get().SaveNonogramData(nonogramID, saveData);
 
@@ -155,7 +154,6 @@ public class SolvingGameMode : DrawingGameMode
 
     private void OnContinueButtonClicked()
     {
-        //#TODO: Make custom scene loader
         GameManager.Get().LoadMainMenu();
     }
 

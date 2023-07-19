@@ -51,7 +51,6 @@ public class CreationGameMode : DrawingGameMode
     {
         string selectedCategoryName = m_NonogramConfigScreenViewModel.GetSelectedCategoryName();
 
-        //#TODO: Bit hacky. Find a better place to store info and do this logic
         if (selectedCategoryName == K_CREATE_NEW_CATEGORY_STRING)
         {
             m_NonogramConfigScreenViewModel.GetNewCategoryPanel().SetActive(true);
@@ -70,7 +69,6 @@ public class CreationGameMode : DrawingGameMode
         
         if (NonogramHelpers.CreateNewCategory(categoryName))
         {
-            //#TODO: notification
             GameManager.Get().LoadNonogramSets();
             m_NonogramConfigScreenViewModel.PopulateCategoriesDropdown(K_CREATE_NEW_CATEGORY_STRING);
             m_NonogramConfigScreenViewModel.GetNewCategoryPanel().SetActive(false);

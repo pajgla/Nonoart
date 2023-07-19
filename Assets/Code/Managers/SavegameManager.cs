@@ -70,7 +70,6 @@ namespace Save
             {
                 if (savegameVersion != m_SavegameVersion)
                 {
-                    //#TODO: Implement different savegame loadings
                     Debug.LogError("Savegame version is not compatibile anymore. Check for savegame version before loading the save.");
                     return null;
                 }
@@ -165,7 +164,6 @@ namespace Save
                     }
                     else
                     {
-                        //#TODO: Implement savegame version loading
                         Debug.LogError("Invalid save version");
                     }
                 }
