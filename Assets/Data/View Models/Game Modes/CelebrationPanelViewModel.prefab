@@ -467,7 +467,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &6741643070314412925
 MonoBehaviour:
@@ -525,7 +525,6 @@ MonoBehaviour:
   m_TotalTimeText: {fileID: 1742489516905633693}
   m_NonogramTexture: {fileID: 180686232289734852}
   m_ContinueButton: {fileID: 1337476120036938301}
-  m_PanelObject: {fileID: 3848155794541947126}
   m_TotalTimePrefix: 'Time:'
 --- !u!1 &3848155794541947126
 GameObject:

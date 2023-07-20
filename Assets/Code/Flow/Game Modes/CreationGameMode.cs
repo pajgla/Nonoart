@@ -83,6 +83,7 @@ public class CreationGameMode : DrawingGameMode
         m_GridHeight = (int)m_ConfigurationViewModel.GetHeightValueSelector().GetValue();
 
         m_ColorPickerViewModel = ViewModelHelper.SpawnAndInitialize(m_ColorPickerViewModelRef);
+        m_ColorPickerViewModel.ShowColorPickerWindow();
 
         StartCoroutine(m_GridController.SpawnEmptyGrid(m_GridWidth, m_GridHeight));
     }
