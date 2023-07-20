@@ -16,9 +16,11 @@ public class SolvingGameMode : DrawingGameMode
 
     [Header("References")]
     [SerializeField] CelebrationPanelViewModel m_CelebrationPanelViewModelRef = null;
+    [SerializeField] GameOverViewModel m_GameOverViewModelRef = null;
 
     //Viewmodels
     CelebrationPanelViewModel m_CelebrationPanelViewModel = null;
+    GameOverViewModel m_GameOverViewModel = null;
 
     public override void Init(GameModeData gameModeData)
     {
@@ -41,6 +43,11 @@ public class SolvingGameMode : DrawingGameMode
         m_CelebrationPanelViewModel = ViewModelHelper.SpawnAndInitialize(m_CelebrationPanelViewModelRef);
         m_CelebrationPanelViewModel.ChangeViewModelVisibility(false);
         m_CelebrationPanelViewModel.GetContinueButton().onClick.AddListener(OnContinueButtonClicked);
+
+        m_GameOverViewModel = ViewModelHelper.SpawnAndInitialize(m_GameOverViewModelRef);
+        m_GameOverViewModel.GetRetryButton().onClick.AddListener(OnRestartLevelButtonPressed);
+        m_GameOverViewModel.GetGoToMainMenuButton().onClick.AddListener(OnGoToMainMenuButtonPressed);
+        m_GameOverViewModel.ChangeViewModelVisibility(false);
     }
 
     protected override void Update()
@@ -137,19 +144,22 @@ public class SolvingGameMode : DrawingGameMode
     private void OnWrongGuess()
     {
         m_LivesLeft--;
-        m_ControlBarViewModel.SetLives(m_LivesLeft);
 
-        if (m_LivesLeft == 0)
+        //<= because we have 0 lives when we start the level, and we want to fail on the first error
+        if (m_LivesLeft <= 0)
         {
-            m_CanDraw = false;
             OnGameOver();
+            m_LivesLeft = 0;
         }
+
+        m_ControlBarViewModel.SetLives(m_LivesLeft);
     }
 
     private void OnGameOver()
     {
         m_IsPaused = true;
-        //#TODO: update UI
+        m_CanDraw = false;
+        m_GameOverViewModel.ChangeViewModelVisibility(true);
     }
 
     private void OnContinueButtonClicked()

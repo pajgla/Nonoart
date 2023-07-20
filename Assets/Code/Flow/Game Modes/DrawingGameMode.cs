@@ -98,7 +98,7 @@ public abstract class DrawingGameMode : GameMode
         m_CanDraw = false;
     }
 
-    void OnRestartLevelButtonPressed()
+    protected void OnRestartLevelButtonPressed()
     {
         GameManager.Get().ReloadCurrentLevel();
     }
@@ -110,7 +110,7 @@ public abstract class DrawingGameMode : GameMode
         m_CanDraw = true;
     }
 
-    void OnGoToMainMenuButtonPressed()
+    protected void OnGoToMainMenuButtonPressed()
     {
         GameManager.Get().LoadMainMenu();
     }
