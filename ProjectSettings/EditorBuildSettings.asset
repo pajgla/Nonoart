@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Nonogram Level.unity
     guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/Nonogram Creation Scene.unity
+  - enabled: 0
+    path: Assets/Scenes/-- NOT IN USE -- Nonogram Creation Scene.unity
     guid: 2aac31413b9e71e4680399f42981d7a9
   m_configObjects: {}
